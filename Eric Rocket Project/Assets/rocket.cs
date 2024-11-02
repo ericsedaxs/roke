@@ -10,6 +10,10 @@ public class rocket : Agent
     public Rigidbody rb;
     bool thrusterOn = false;
     public GameObject platform;
+    public Material successMaterial;
+    public Material failMaterial;
+
+    float lastY = 500f;
 
     public override void OnEpisodeBegin()
     {
@@ -45,6 +49,7 @@ public class rocket : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
+        Debug.Log(discreteActions[0]);
         if (discreteActions[0] == 1) {
             thrusterOn = true;
         } else {
@@ -60,14 +65,52 @@ public class rocket : Agent
     {
         var actions = actionsOut.DiscreteActions;
         actions[0] = 0;
-        if (Input.GetKeyDown(KeyCode.Return) && !thrusterOn) {
+        // if (Input.GetKeyDown(KeyCode.Return) && !thrusterOn) {
+        //     Debug.Log("Thruster On");
+        //     actions[0] = 1;
+        // } else if (Input.GetKeyDown(KeyCode.Return) && thrusterOn) {
+        //     Debug.Log("Thruster Off");
+        //     actions[0] = 0;
+        // }
+        if (Input.GetKey(KeyCode.Return)) {
             actions[0] = 1;
-        } else if (Input.GetKeyDown(KeyCode.Return) && thrusterOn) {
-            actions[0] = 0;
+        }
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Goal")) {
+            // check vertical speed
+            Debug.Log($"This was the speed: {rb.linearVelocity.magnitude}");
+            if (rb.linearVelocity.magnitude <= 0 && rb.linearVelocity.magnitude >= -5) {
+                SetReward(1.0f);
+                platform.GetComponent<MeshRenderer>().material = successMaterial;
+                EndEpisode();
+            } else {
+                SetReward(-1.0f);
+                platform.GetComponent<MeshRenderer>().material = failMaterial;
+                EndEpisode();
+            }
         }
     }
 
     // Update is called once per frame
+    void Update() {
+        if (transform.localPosition.y < platform.transform.localPosition.y) {
+            SetReward(-1.0f);
+            platform.GetComponent<MeshRenderer>().material = failMaterial;
+            EndEpisode();
+        }
+
+        if (transform.localPosition.y > lastY) {
+            SetReward(-1.0f)
+            platform.GetComponent<MeshRenderer>().material = failMaterial;
+            EndEpisode();
+        }
+
+        lastY = transform.localPosition.y;
+    }
+
     // void Update()
     // {
     //     if (Input.GetKeyDown(KeyCode.Return)) { // GetKey, GetKeyDown, GetKeyUp

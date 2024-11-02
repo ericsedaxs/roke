@@ -390,8 +390,8 @@ GameObject:
   - component: {fileID: 489245354}
   - component: {fileID: 489245353}
   m_Layer: 0
-  m_Name: Cube
-  m_TagString: Untagged
+  m_Name: platform
+  m_TagString: Goal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -515,7 +515,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!65 &655756222
 BoxCollider:
@@ -554,9 +554,11 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  power: 10000
+  power: 100000
   rb: {fileID: 655756221}
-  platform: {fileID: 0}
+  platform: {fileID: 489245352}
+  successMaterial: {fileID: 2100000, guid: 34428ae3c0318034f928fa0e1980a22f, type: 2}
+  failMaterial: {fileID: 2100000, guid: 7dabedd9cf8f1a94daefb70b5be605d4, type: 2}
 --- !u!114 &655756225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,7 +572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 17
+    VectorObservationSize: 19
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -581,13 +583,28 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 1
   m_BehaviorName: rocket landing
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_DeterministicInference: 0
   m_ObservableAttributeHandling: 0
+--- !u!114 &655756226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655756219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  DecisionStep: 0
+  TakeActionsBetweenDecisions: 1
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1058,6 +1075,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 080f71e42c04005489579bb473998303, type: 3}
       insertIndex: -1
       addedObject: {fileID: 655756225}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 080f71e42c04005489579bb473998303, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 655756226}
   m_SourcePrefab: {fileID: 100100000, guid: 080f71e42c04005489579bb473998303, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
