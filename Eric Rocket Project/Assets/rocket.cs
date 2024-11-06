@@ -49,7 +49,7 @@ public class rocket : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
-        Debug.Log(discreteActions[0]);
+        // Debug.Log(discreteActions[0]);
         if (discreteActions[0] == 1) {
             thrusterOn = true;
         } else {
@@ -82,6 +82,7 @@ public class rocket : Agent
         if (collision.gameObject.CompareTag("Goal")) {
             // check vertical speed
             Debug.Log($"This was the speed: {rb.linearVelocity.magnitude}");
+            Debug.Log($"This was the y: {rb.linearVelocity.y}");
             if (rb.linearVelocity.magnitude <= 0 && rb.linearVelocity.magnitude >= -5) {
                 SetReward(1.0f);
                 platform.GetComponent<MeshRenderer>().material = successMaterial;
@@ -102,8 +103,8 @@ public class rocket : Agent
             EndEpisode();
         }
 
-        if (transform.localPosition.y > lastY) {
-            SetReward(-1.0f)
+        if (transform.localPosition.y > (lastY - 10)) {
+            SetReward(-1.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             EndEpisode();
         }
