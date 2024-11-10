@@ -10,10 +10,14 @@ public class rocket : Agent
     public Rigidbody rb;
     bool thrusterOn = false;
     public GameObject platform;
+    public GameObject northThruster;
+    public GameObject southThruster;
+    public GameObject eastThruster;
+    public GameObject westThruster;
     public Material successMaterial;
     public Material failMaterial;
 
-    float lastY = 500f;
+    float lastY = 1000f;
 
     public override void OnEpisodeBegin()
     {
@@ -59,12 +63,20 @@ public class rocket : Agent
         if (thrusterOn) {
             rb.AddForce(transform.up * power);
         }
+
+        if (discreteActions[1] == 1) {
+            northThruster.GetComponent<Rigidbody>().AddForce(transform.forward * (power / 10));
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var actions = actionsOut.DiscreteActions;
         actions[0] = 0;
+        actions[1] = 0;
+        actions[2] = 0;
+        actions[3] = 0;
+        actions[4] = 0;
         // if (Input.GetKeyDown(KeyCode.Return) && !thrusterOn) {
         //     Debug.Log("Thruster On");
         //     actions[0] = 1;
@@ -74,6 +86,22 @@ public class rocket : Agent
         // }
         if (Input.GetKey(KeyCode.Return)) {
             actions[0] = 1;
+        }
+
+        if (Input.GetKey(KeyCode.W)) {
+            actions[1] = 1;
+        }
+
+        if (Input.GetKey(KeyCode.A)) {
+            actions[2] = 1;
+        }
+
+        if (Input.GetKey(KeyCode.S)) {
+            actions[3] = 1;
+        }
+
+        if (Input.GetKey(KeyCode.D)) {
+            actions[4] = 1;
         }
     }
 
@@ -103,25 +131,12 @@ public class rocket : Agent
             EndEpisode();
         }
 
-        if (transform.localPosition.y > (lastY - 10)) {
-            SetReward(-1.0f);
-            platform.GetComponent<MeshRenderer>().material = failMaterial;
-            EndEpisode();
-        }
+        // if (transform.localPosition.y > (lastY - 10)) {
+        //     SetReward(-1.0f);
+        //     platform.GetComponent<MeshRenderer>().material = failMaterial;
+        //     EndEpisode();
+        // }
 
-        lastY = transform.localPosition.y;
+        // lastY = transform.localPosition.y;
     }
-
-    // void Update()
-    // {
-    //     if (Input.GetKeyDown(KeyCode.Return)) { // GetKey, GetKeyDown, GetKeyUp
-    //         thrusterOn = !thrusterOn;
-    //         Debug.Log($"Thruster State: {thrusterOn}");
-    //     }
-
-    //     if (thrusterOn) {
-    //         rb.AddForce(transform.up * power);
-    //     }
-        
-    // }
 }
