@@ -10,10 +10,6 @@ public class rocket : Agent
     public Rigidbody rb;
     bool thrusterOn = false;
     public GameObject platform;
-    public GameObject northThruster;
-    public GameObject southThruster;
-    public GameObject eastThruster;
-    public GameObject westThruster;
     public Material successMaterial;
     public Material failMaterial;
 
@@ -65,7 +61,24 @@ public class rocket : Agent
         }
 
         if (discreteActions[1] == 1) {
-            northThruster.GetComponent<Rigidbody>().AddForce(transform.forward * (power / 10));
+            Debug.Log("North Thruster On");
+            // rotate the rocket north
+            transform.Rotate(Vector3.right * 0.1f);
+        }
+        if (discreteActions[2] == 1) {
+            Debug.Log("East Thruster On");
+            // rotate the rocket east
+            transform.Rotate(Vector3.forward * 0.1f);
+        }
+        if (discreteActions[3] == 1) {
+            Debug.Log("South Thruster On");
+            // rotate the rocket south
+            transform.Rotate(Vector3.right * -0.1f);
+        }
+        if (discreteActions[4] == 1) {
+            Debug.Log("West Thruster On");
+            // rotate the rocket west
+            transform.Rotate(Vector3.forward * -0.1f);
         }
     }
 
@@ -131,12 +144,12 @@ public class rocket : Agent
             EndEpisode();
         }
 
-        // if (transform.localPosition.y > (lastY - 10)) {
-        //     SetReward(-1.0f);
-        //     platform.GetComponent<MeshRenderer>().material = failMaterial;
-        //     EndEpisode();
-        // }
+        if (transform.localPosition.y > (lastY)) {
+            SetReward(-1.0f);
+            platform.GetComponent<MeshRenderer>().material = failMaterial;
+            EndEpisode();
+        }
 
-        // lastY = transform.localPosition.y;
+        lastY = transform.localPosition.y;
     }
 }

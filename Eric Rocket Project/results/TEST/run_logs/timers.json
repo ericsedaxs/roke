@@ -2,7 +2,7 @@
     "name": "root",
     "metadata": {
         "timer_format_version": "0.1.0",
-        "start_time_seconds": "1731194436",
+        "start_time_seconds": "1731799240",
         "python_version": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
         "command_line_arguments": "C:\\Users\\\u5f20\u5609\u5cfb\\Documents\\GitHub\\roke\\Eric Rocket Project\\venv\\Scripts\\mlagents-learn --run-id=TEST --force",
         "mlagents_version": "1.1.0",
@@ -10,31 +10,31 @@
         "communication_protocol_version": "1.5.0",
         "pytorch_version": "2.2.2+cpu",
         "numpy_version": "1.23.5",
-        "end_time_seconds": "1731194500"
+        "end_time_seconds": "1731799304"
     },
-    "total": 64.4533209999936,
+    "total": 64.04221549999784,
     "count": 1,
-    "self": 0.009044599995831959,
+    "self": 0.0052146000089123845,
     "children": {
         "run_training.setup": {
-            "total": 0.492004600004293,
+            "total": 0.2600402999960352,
             "count": 1,
-            "self": 0.492004600004293
+            "self": 0.2600402999960352
         },
         "TrainerController.start_learning": {
-            "total": 63.95227179999347,
+            "total": 63.77696059999289,
             "count": 1,
-            "self": 0.0001728000061120838,
+            "self": 0.00011759999324567616,
             "children": {
                 "TrainerController._reset_env": {
-                    "total": 63.95204279999598,
+                    "total": 63.77681520000624,
                     "count": 1,
-                    "self": 63.95204279999598
+                    "self": 63.77681520000624
                 },
                 "TrainerController._save_models": {
-                    "total": 5.6199991377070546e-05,
+                    "total": 2.7799993404187262e-05,
                     "count": 1,
-                    "self": 5.6199991377070546e-05
+                    "self": 2.7799993404187262e-05
                 }
             }
         }
