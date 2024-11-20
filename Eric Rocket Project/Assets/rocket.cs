@@ -144,7 +144,9 @@ public class rocket : Agent
             EndEpisode();
         }
 
-        if (transform.localPosition.y > (lastY)) {
+        // ignore in heuristic mode
+        bool isHeuristic = Academy.Instance.IsCommunicatorOn;
+        if (transform.localPosition.y > (lastY) && !isHeuristic) {
             SetReward(-1.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             EndEpisode();
