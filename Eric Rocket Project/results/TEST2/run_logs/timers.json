@@ -1,0 +1,42 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1732402597",
+        "python_version": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\Users\\\u5f20\u5609\u5cfb\\Documents\\GitHub\\roke\\Eric Rocket Project\\venv\\Scripts\\mlagents-learn --run-id=TEST2",
+        "mlagents_version": "1.1.0",
+        "mlagents_envs_version": "1.1.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "2.2.2+cpu",
+        "numpy_version": "1.23.5",
+        "end_time_seconds": "1732402661"
+    },
+    "total": 63.39747189998161,
+    "count": 1,
+    "self": 0.01423809997504577,
+    "children": {
+        "run_training.setup": {
+            "total": 0.17405470000812784,
+            "count": 1,
+            "self": 0.17405470000812784
+        },
+        "TrainerController.start_learning": {
+            "total": 63.20917909999844,
+            "count": 1,
+            "self": 0.00011509994510561228,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 63.20903730002465,
+                    "count": 1,
+                    "self": 63.20903730002465
+                },
+                "TrainerController._save_models": {
+                    "total": 2.670002868399024e-05,
+                    "count": 1,
+                    "self": 2.670002868399024e-05
+                }
+            }
+        }
+    }
+}

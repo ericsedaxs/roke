@@ -313,11 +313,11 @@ MonoBehaviour:
   - {fileID: 875145609}
   - {fileID: 348895818}
   currentTarget: {fileID: 0}
-  offset: {x: 0, y: 0, z: 0}
+  offset: {x: 0, y: 20, z: 0}
   zoomSpeed: 4
   currentZoom: 10
-  minZoom: 5
-  maxZoom: 15
+  minZoom: 0
+  maxZoom: 500
   xSpeed: 100
   ySpeed: 100
 --- !u!1001 &337226124
