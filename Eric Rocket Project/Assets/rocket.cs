@@ -13,6 +13,9 @@ public class rocket : Agent
     public Material successMaterial;
     public Material failMaterial;
 
+    private Vector3 previousPosition;
+    public Vector3 currentVelocity { get; private set; }
+
     float lastY = 1000f;
 
     public override void OnEpisodeBegin()
@@ -20,6 +23,7 @@ public class rocket : Agent
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(0, 500f, 0);
+        previousPosition = transform.localPosition;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -60,26 +64,26 @@ public class rocket : Agent
             rb.AddForce(transform.up * power);
         }
 
-        if (discreteActions[1] == 1) {
-            Debug.Log("North Thruster On");
-            // rotate the rocket north
-            transform.Rotate(Vector3.right * 0.1f);
-        }
-        if (discreteActions[2] == 1) {
-            Debug.Log("East Thruster On");
-            // rotate the rocket east
-            transform.Rotate(Vector3.forward * 0.1f);
-        }
-        if (discreteActions[3] == 1) {
-            Debug.Log("South Thruster On");
-            // rotate the rocket south
-            transform.Rotate(Vector3.right * -0.1f);
-        }
-        if (discreteActions[4] == 1) {
-            Debug.Log("West Thruster On");
-            // rotate the rocket west
-            transform.Rotate(Vector3.forward * -0.1f);
-        }
+        // if (discreteActions[1] == 1) {
+        //     Debug.Log("North Thruster On");
+        //     // rotate the rocket north
+        //     transform.Rotate(Vector3.right * 0.1f);
+        // }
+        // if (discreteActions[2] == 1) {
+        //     Debug.Log("East Thruster On");
+        //     // rotate the rocket east
+        //     transform.Rotate(Vector3.forward * 0.1f);
+        // }
+        // if (discreteActions[3] == 1) {
+        //     Debug.Log("South Thruster On");
+        //     // rotate the rocket south
+        //     transform.Rotate(Vector3.right * -0.1f);
+        // }
+        // if (discreteActions[4] == 1) {
+        //     Debug.Log("West Thruster On");
+        //     // rotate the rocket west
+        //     transform.Rotate(Vector3.forward * -0.1f);
+        // }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -122,14 +126,15 @@ public class rocket : Agent
     {
         if (collision.gameObject.CompareTag("Goal")) {
             // check vertical speed
-            Debug.Log($"This was the speed: {rb.linearVelocity.magnitude}");
-            Debug.Log($"This was the y: {rb.linearVelocity.y}");
-            if (rb.linearVelocity.magnitude <= 0 && rb.linearVelocity.magnitude >= -5) {
+
+            if (currentVelocity.y >= -15) {
                 SetReward(1.0f);
+                Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = successMaterial;
                 EndEpisode();
             } else {
                 SetReward(-1.0f);
+                Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = failMaterial;
                 EndEpisode();
             }
@@ -137,8 +142,12 @@ public class rocket : Agent
     }
 
     // Update is called once per frame
-    void Update() {
-        if (transform.localPosition.y < platform.transform.localPosition.y) {
+    void FixedUpdate() {
+        currentVelocity = (transform.localPosition - previousPosition) / Time.deltaTime;
+        // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
+        previousPosition = transform.localPosition;
+
+        if (transform.localPosition.y < (platform.transform.localPosition.y - 10)) {
             SetReward(-1.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             EndEpisode();
