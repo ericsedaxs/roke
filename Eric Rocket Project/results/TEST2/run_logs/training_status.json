@@ -2,22 +2,22 @@
     "rocket landing": {
         "checkpoints": [
             {
-                "steps": 99897,
-                "file_path": "results/TEST2/rocket landing/rocket landing-99897.onnx",
+                "steps": 8505,
+                "file_path": "results/TEST2/rocket landing/rocket landing-8505.onnx",
                 "reward": -1.0,
-                "creation_time": 1732671194.849611,
+                "creation_time": 1732406584.829014,
                 "auxillary_file_paths": [
-                    "results/TEST2/rocket landing/rocket landing-99897.pt"
+                    "results/TEST2/rocket landing/rocket landing-8505.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 99897,
+            "steps": 8505,
             "file_path": "results/TEST2/rocket landing.onnx",
             "reward": -1.0,
-            "creation_time": 1732671194.849611,
+            "creation_time": 1732406584.829014,
             "auxillary_file_paths": [
-                "results/TEST2/rocket landing/rocket landing-99897.pt"
+                "results/TEST2/rocket landing/rocket landing-8505.pt"
             ]
         }
     },
