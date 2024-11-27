@@ -24,6 +24,7 @@ public class rocket : Agent
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(0, 500f, 0);
         previousPosition = transform.localPosition;
+        lastY = 1000f;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -148,19 +149,25 @@ public class rocket : Agent
         previousPosition = transform.localPosition;
 
         if (transform.localPosition.y < (platform.transform.localPosition.y - 10)) {
+            Debug.Log("Failed because of going below the platform");
             SetReward(-1.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
+            lastY = 1000f;
             EndEpisode();
         }
 
         // ignore in heuristic mode
-        bool isHeuristic = Academy.Instance.IsCommunicatorOn;
-        if (transform.localPosition.y > (lastY) && !isHeuristic) {
+        // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
+        if (transform.localPosition.y > (lastY)) {
+            Debug.Log("Failed because of going up");
             SetReward(-1.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
+            lastY = 1000f;
             EndEpisode();
         }
 
         lastY = transform.localPosition.y;
     }
 }
+
+// https://github.com/gzrjzcx/ML-agents/blob/master/docs/Training-Imitation-Learning.md
