@@ -16,6 +16,12 @@ public class rocket : Agent
     private Vector3 previousPosition;
     public Vector3 currentVelocity { get; private set; }
 
+    public GameObject mainThrusterParticles;
+    public GameObject northThrusterParticles;
+    public GameObject eastThrusterParticles;
+    public GameObject southThrusterParticles;
+    public GameObject westThrusterParticles;
+
     float lastY = 1000f;
 
     public override void OnEpisodeBegin()
@@ -57,8 +63,10 @@ public class rocket : Agent
         // Debug.Log(discreteActions[0]);
         if (discreteActions[0] == 1) {
             thrusterOn = true;
+            mainThrusterParticles.SetActive(true);
         } else {
             thrusterOn = false;
+            mainThrusterParticles.SetActive(false);
         }
 
         if (thrusterOn) {
@@ -69,21 +77,36 @@ public class rocket : Agent
         //     Debug.Log("North Thruster On");
         //     // rotate the rocket north
         //     transform.Rotate(Vector3.right * 0.1f);
+        //     northThrusterParticles.SetActive(true);
+        // } else {
+        //     northThrusterParticles.SetActive(false);
         // }
+
         // if (discreteActions[2] == 1) {
         //     Debug.Log("East Thruster On");
         //     // rotate the rocket east
         //     transform.Rotate(Vector3.forward * 0.1f);
+        //     eastThrusterParticles.SetActive(true);
+        // } else {
+        //     eastThrusterParticles.SetActive(false);
         // }
+
         // if (discreteActions[3] == 1) {
         //     Debug.Log("South Thruster On");
         //     // rotate the rocket south
         //     transform.Rotate(Vector3.right * -0.1f);
+        //     southThrusterParticles.SetActive(true);
+        // } else {
+        //     southThrusterParticles.SetActive(false);
         // }
+
         // if (discreteActions[4] == 1) {
         //     Debug.Log("West Thruster On");
         //     // rotate the rocket west
         //     transform.Rotate(Vector3.forward * -0.1f);
+        //     westThrusterParticles.SetActive(true);
+        // } else {
+        //     westThrusterParticles.SetActive(false);
         // }
     }
 
