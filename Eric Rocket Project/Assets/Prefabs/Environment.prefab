@@ -24462,7 +24462,7 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  power: 55017624
+  power: 5300176
   rb: {fileID: 6217060365792644269}
   platform: {fileID: 7591555715356754241}
   successMaterial: {fileID: 2100000, guid: 34428ae3c0318034f928fa0e1980a22f, type: 2}

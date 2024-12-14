@@ -26,11 +26,11 @@ public class rocket : Agent
 
     public override void OnEpisodeBegin()
     {
+        lastY = 1000f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(0, 500f, 0);
         previousPosition = transform.localPosition;
-        lastY = 1000f;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -152,12 +152,12 @@ public class rocket : Agent
             // check vertical speed
 
             if (currentVelocity.y >= -15) {
-                SetReward(1.0f);
+                SetReward(20.0f);
                 Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = successMaterial;
                 EndEpisode();
             } else {
-                SetReward(-1.0f);
+                SetReward(-20.0f);
                 Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = failMaterial;
                 EndEpisode();
@@ -173,7 +173,7 @@ public class rocket : Agent
 
         if (transform.localPosition.y < (platform.transform.localPosition.y - 10)) {
             Debug.Log("Failed because of going below the platform");
-            SetReward(-1.0f);
+            SetReward(-10.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
             EndEpisode();
@@ -182,8 +182,17 @@ public class rocket : Agent
         // ignore in heuristic mode
         // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
         if (transform.localPosition.y > (lastY)) {
-            Debug.Log("Failed because of going up");
-            SetReward(-1.0f);
+            AddReward(-0.01f);
+            // platform.GetComponent<MeshRenderer>().material = failMaterial;
+            // lastY = 1000f;
+            // EndEpisode();
+        } else if (transform.localPosition.y < (lastY)) {
+            AddReward(0.01f);
+        }
+
+        if (transform.localPosition.y > 550f) {
+            Debug.Log("Failed because of going too high");
+            AddReward(-10.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
             EndEpisode();

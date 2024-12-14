@@ -5,7 +5,7 @@ behaviors:
       batch_size: 512 # number of experiences used per training update
       buffer_size: 10240 # number of experiences stored in the replay buffer; the larger the buffer, the stable but slower the training
       learning_rate: 3.0e-4 # step size for updating the model parameters; the smaller the learning rate, the slower but more stable the training
-      beta: 1.0e-3 # strength of the entropy regularization term; the larger the beta, the more exploration
+      beta: 1.0e-2 # strength of the entropy regularization term; the larger the beta, the more exploration
       epsilon: 0.2 # Clipping parameter for PPO; controls how much the policy can change during an update
       lambd: 0.95 # (0-1) the higher, the less biased but more variable the estimate of the advantage function
       learning_rate_schedule: linear # learning rate schedule; options: constant, linear, exponential Note: decrease the learning rate over time to stabilize training
@@ -26,7 +26,7 @@ behaviors:
           strength: 0.1 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
       gail:
         strength: 0.1 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-        demo_path: "demos/LandingDemo.demo"
+        demo_path: "demo/LandingDemo.demo"
         network_settings:
           normalize: false # normalize the input states
           hidden_units: 128 # number of units in the hidden layers
@@ -34,7 +34,7 @@ behaviors:
           strength: 0.1 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
     behavioral_cloning:
       strength: 0.5 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-      demo_path: "demos/LandingDemo.demo"
+      demo_path: "demo/LandingDemo.demo"
     max_steps: 750000 # maximum number of steps in a given training session
     time_horizon: 128 # number of steps the agent considers before making a decision
     summary_freq: 20000 # how often to save training statistics
