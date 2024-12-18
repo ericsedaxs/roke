@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TitleScreen : MonoBehaviour
 {
@@ -14,7 +15,13 @@ public class TitleScreen : MonoBehaviour
         
     }
 
-    void quit()
+    public void startGame()
+    {
+        // Load the scene with the name "Game"
+        SceneManager.LoadScene("SampleScene");
+    }
+
+    public void quit()
     {
         Application.Quit();
     }

@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using TMPro;
 
 public class rocket : Agent
 {
@@ -21,11 +22,24 @@ public class rocket : Agent
     public GameObject eastThrusterParticles;
     public GameObject southThrusterParticles;
     public GameObject westThrusterParticles;
+    public TMP_Dropdown rocketDropdown;
+
+    public GameObject falcon9_1;
+    public GameObject falcon9_2;
+    public GameObject falcon9_3;
+    public GameObject saturnV;
+    public GameObject falconHeavy;
+
+    public TMP_InputField powerInput;
+    public TMP_InputField massInput;
 
     float lastY = 1000f;
 
     public override void OnEpisodeBegin()
     {
+        powerInput.text = power.ToString();
+        massInput.text = rb.mass.ToString();
+
         lastY = 1000f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -167,6 +181,9 @@ public class rocket : Agent
 
     // Update is called once per frame
     void FixedUpdate() {
+        power = float.Parse(powerInput.text);
+        rb.mass = float.Parse(massInput.text);
+
         currentVelocity = (transform.localPosition - previousPosition) / Time.deltaTime;
         // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
         previousPosition = transform.localPosition;
@@ -199,6 +216,31 @@ public class rocket : Agent
         }
 
         lastY = transform.localPosition.y;
+    }
+
+    public void changeRocket() {
+        string chosenRocket = rocketDropdown.options[rocketDropdown.value].text;
+        Debug.Log("Changing Rocket to: " + chosenRocket);
+
+        if (chosenRocket == "Falcon 9") {
+            falcon9_1.SetActive(true);
+            falcon9_2.SetActive(true);
+            falcon9_3.SetActive(true);
+            saturnV.SetActive(false);
+            falconHeavy.SetActive(false);
+        } else if (chosenRocket == "Saturn V") {
+            falcon9_1.SetActive(false);
+            falcon9_2.SetActive(false);
+            falcon9_3.SetActive(false);
+            saturnV.SetActive(true);
+            falconHeavy.SetActive(false);
+        } else if (chosenRocket == "Falcon Heavy") {
+            falcon9_1.SetActive(false);
+            falcon9_2.SetActive(false);
+            falcon9_3.SetActive(false);
+            saturnV.SetActive(false);
+            falconHeavy.SetActive(true);
+        }
     }
 }
 
