@@ -1,53 +1,92 @@
 behaviors:
   rocket landing:
     trainer_type: ppo
-    hyperparameters:
-      batch_size: 512 # number of experiences used per training update
-      buffer_size: 10240 # number of experiences stored in the replay buffer; the larger the buffer, the stable but slower the training
-      learning_rate: 3.0e-4 # step size for updating the model parameters; the smaller the learning rate, the slower but more stable the training
-      beta: 1.0e-2 # strength of the entropy regularization term; the larger the beta, the more exploration
-      epsilon: 0.2 # Clipping parameter for PPO; controls how much the policy can change during an update
-      lambd: 0.95 # (0-1) the higher, the less biased but more variable the estimate of the advantage function
-      learning_rate_schedule: linear # learning rate schedule; options: constant, linear, exponential Note: decrease the learning rate over time to stabilize training
-      num_epoch:    3 # number of times the training loop is run per update
-    network_settings:
-      normalize: false # normalize the input states
-      hidden_units: 1024 # number of units in the hidden layers (originally 256)
-      num_layers: 5 # number of hidden layers (originally 3)
-      strength: 0.1 # (0-1) scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-    reward_signals:
-      extrinsic:
-        gamma: 0.99 # discount factor for future rewards
-        strength: 1.0 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-        network_settings:
-          normalize: false # normalize the input states
-          hidden_units: 128 # number of units in the hidden layers
-          num_layers: 2 # number of hidden layers
-          strength: 0.1 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-      gail:
-        strength: 0.1 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-        demo_path: "demo/LandingDemo.demo"
-        network_settings:
-          normalize: false # normalize the input states
-          hidden_units: 128 # number of units in the hidden layers
-          num_layers: 2 # number of hidden layers
-          strength: 0.1 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-    behavioral_cloning:
-      strength: 0.5 # scales the reward signal; the larger the strength, the more the agent relies on the reward signal
-      demo_path: "demo/LandingDemo.demo"
-    max_steps: 750000 # maximum number of steps in a given training session
-    time_horizon: 128 # number of steps the agent considers before making a decision
-    summary_freq: 20000 # how often to save training statistics
 
-# default_settings: null
+    hyperparameters:
+      # Hyperparameters common to PPO and SAC
+      batch_size: 1024
+      buffer_size: 10240
+      learning_rate: 3.0e-4
+      learning_rate_schedule: linear
+
+      # PPO-specific hyperparameters
+      beta: 5.0e-3
+      beta_schedule: constant
+      epsilon: 0.2
+      epsilon_schedule: linear
+      lambd: 0.95
+      num_epoch: 3
+      shared_critic: False
+
+    # Configuration of the neural network (common to PPO/SAC)
+    network_settings:
+      vis_encode_type: simple
+      normalize: false
+      hidden_units: 128
+      num_layers: 2
+      # memory
+      memory:
+        sequence_length: 64
+        memory_size: 256
+
+    # Trainer configurations common to all trainers
+    max_steps: 5.0e5
+    time_horizon: 64
+    summary_freq: 10000
+    keep_checkpoints: 5
+    checkpoint_interval: 50000
+    threaded: false
+    init_path: null
+
+    # behavior cloning
+    behavioral_cloning:
+      demo_path: "demo/NewLanding.demo"
+      strength: 0.5
+      steps: 150000
+      batch_size: 512
+      num_epoch: 3
+      samples_per_update: 0
+
+    reward_signals:
+      # environment reward (default)
+      extrinsic:
+        strength: 1.0
+        gamma: 0.99
+
+      # curiosity module
+      curiosity:
+        strength: 0.02
+        gamma: 0.99
+        encoding_size: 256
+        learning_rate: 3.0e-4
+
+      # GAIL
+      gail:
+        strength: 0.5
+        gamma: 0.99
+        encoding_size: 128
+        demo_path: "demo/NewLanding.demo"
+        learning_rate: 3.0e-4
+        use_actions: false
+        use_vail: false
+
+    # self-play
+    self_play:
+      window: 10
+      play_against_latest_model_ratio: 0.5
+      save_steps: 50000
+      swap_steps: 2000
+      team_change: 100000
+
+
 # behaviors:
 #   rocket landing:
 #     trainer_type: ppo
 #     hyperparameters:
-#       batch_size: 512
+#       batch_size: 1024
 #       buffer_size: 10240
 #       learning_rate: 0.0003
-#       beta: 0.005
+#       beta: 0.01
 #       epsilon: 0.2
 #       lambd: 0.95
 #       num_epoch: 3
@@ -58,8 +97,8 @@ behaviors:
 #     checkpoint_interval: 500000
 #     network_settings:
 #       normalize: false
-#       hidden_units: 512
-#       num_layers: 3
+#       hidden_units: 128
+#       num_layers: 2
 #       vis_encode_type: simple
 #       memory: null
 #       goal_conditioning_type: hyper
@@ -76,15 +115,20 @@ behaviors:
 #           memory: null
 #           goal_conditioning_type: hyper
 #           deterministic: false
+#     #   gail:
+#     #     strength: 0.2
+#     #     demo_path: "demo/NewLanding.demo"
+#     # behavioral_cloning:
+#     #   strength: 0.2
+#     #   demo_path: "demo/NewLanding.demo"
 #     init_path: null
 #     keep_checkpoints: 5
 #     even_checkpoints: false
-#     max_steps: 740000
+#     max_steps: 500000
 #     time_horizon: 64
 #     summary_freq: 20000
 #     threaded: false
 #     self_play: null
-#     behavioral_cloning: null
 # env_settings:
 #   env_path: null
 #   env_args: null
@@ -106,15 +150,15 @@ behaviors:
 #   no_graphics: false
 #   no_graphics_monitor: false
 # environment_parameters: null
-# checkpoint_settings:
-#   run_id: TEST2
-#   initialize_from: null
-#   load_model: false
-#   resume: false
-#   force: true
-#   train_model: false
-#   inference: false
-#   results_dir: results
-# torch_settings:
-#   device: null
-# debug: false
+# # checkpoint_settings:
+# #   run_id: test3
+# #   initialize_from: null
+# #   load_model: false
+# #   resume: false
+# #   force: true
+# #   train_model: false
+# #   inference: false
+# #   results_dir: results
+# # torch_settings:
+# #   device: null
+# # debug: false

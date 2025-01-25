@@ -24445,7 +24445,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!65 &5619549674494735079
 BoxCollider:
@@ -24484,7 +24484,7 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  power: 5300176
+  power: 10000000
   rb: {fileID: 6217060365792644269}
   platform: {fileID: 7591555715356754241}
   successMaterial: {fileID: 2100000, guid: 34428ae3c0318034f928fa0e1980a22f, type: 2}
@@ -24500,6 +24500,8 @@ MonoBehaviour:
   falcon9_3: {fileID: 1640611708420819023}
   saturnV: {fileID: 6313159316972951302}
   falconHeavy: {fileID: 8855903315497687781}
+  powerInput: {fileID: 0}
+  massInput: {fileID: 0}
 --- !u!114 &5064065510667698789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24513,7 +24515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 19
+    VectorObservationSize: 20
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
