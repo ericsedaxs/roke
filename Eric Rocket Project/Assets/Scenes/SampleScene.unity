@@ -7171,7 +7171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Record: 0
   NumStepsToRecord: 0
-  DemonstrationName: NewLanding
+  DemonstrationName: Landing
   DemonstrationDirectory: demo
 --- !u!114 &2660003674714948745 stripped
 MonoBehaviour:

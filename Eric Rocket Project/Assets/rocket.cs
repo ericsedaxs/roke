@@ -36,6 +36,12 @@ public class rocket : Agent
     float lastY = 1000f;
     float targetSpeed = -15.0f;
 
+
+    private float lastXFromPlatform = 0;
+    private float lastZFromPlatform = 0;
+    private float lastXRotation = 0;
+    private float lastZRotation = 0;
+
     public override void OnEpisodeBegin()
     {
         if (powerInput != null && massInput != null) {
@@ -48,6 +54,7 @@ public class rocket : Agent
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(0, 500f, 0);
+        // TODO: set the lastXFromPlatform and lastZFromPlatform to the current distance the platform
         transform.localRotation = Quaternion.identity;
         previousPosition = transform.localPosition;
     }
@@ -179,7 +186,7 @@ public class rocket : Agent
                 platform.GetComponent<MeshRenderer>().material = successMaterial;
                 EndEpisode();
             } else {
-                SetReward(-10.0f);
+                AddReward(-10.0f);
                 Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = failMaterial;
                 EndEpisode();
@@ -199,9 +206,10 @@ public class rocket : Agent
         // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
         previousPosition = transform.localPosition;
 
+        // check if the rocket is below the platform
         if (transform.localPosition.y < (platform.transform.localPosition.y - 10)) {
             Debug.Log("Failed because of going below the platform");
-            SetReward(-15.0f);
+            AddReward(-15.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
             EndEpisode();
@@ -215,18 +223,49 @@ public class rocket : Agent
             // lastY = 1000f;
             // EndEpisode();
         } else if (transform.localPosition.y < (lastY)) {
-            AddReward(0.01f);
+            // AddReward(0.01f);
         }
 
         if (transform.localPosition.y > 550f) {
             Debug.Log("Failed because of going too high");
-            AddReward(-20.0f);
+            SetReward(-20.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
             EndEpisode();
         }
 
+
+        // check horizontal position of the rocket to platform
+        float x_distance = Mathf.Abs(transform.localPosition.x - platform.transform.localPosition.x);
+        float z_distance = Mathf.Abs(transform.localPosition.z - platform.transform.localPosition.z);
+
+        if ((x_distance > 20 || z_distance > 20) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
+            // add some punishment because the rocket is wandering away from the platform
+            AddReward(-0.01f);
+        }
+
+        if (x_distance > 50 || z_distance > 50) {
+            Debug.Log("Failed because of going too far away from the platform");
+            AddReward(-15.0f);
+            platform.GetComponent<MeshRenderer>().material = failMaterial;
+            lastY = 1000f;
+            EndEpisode();
+        }
+
+
+        // check the rotation if in the safe are to make it straight
+        if (x_distance < 20 && z_distance < 20 && (transform.localRotation.x > 1 || transform.localRotation.z > 1)) {
+            if (lastXRotation < transform.localRotation.x || lastZRotation < transform.localRotation.z) {
+                AddReward(-0.01f);
+            }
+        }
+
+
         lastY = transform.localPosition.y;
+        lastXFromPlatform = x_distance;
+        lastZFromPlatform = z_distance;
+        lastXRotation = transform.localRotation.x;
+        lastZRotation = transform.localRotation.z;
     }
 
     public void changeRocket() {
