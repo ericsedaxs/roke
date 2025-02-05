@@ -104,8 +104,10 @@ public class rocket : Agent
 
         if (discreteActions[1] == 1) {
             Debug.Log("North Thruster On");
-            // rotate the rocket north
-            transform.Rotate(Vector3.right * 0.1f);
+            // rotate the rocket north with torque
+            rb.AddTorque(Vector3.right * 0.1f);
+
+            // transform.Rotate(Vector3.right * 0.1f);
             northThrusterParticles.SetActive(true);
         } else {
             northThrusterParticles.SetActive(false);
@@ -114,7 +116,9 @@ public class rocket : Agent
         if (discreteActions[2] == 1) {
             Debug.Log("East Thruster On");
             // rotate the rocket east
-            transform.Rotate(Vector3.forward * 0.1f);
+            rb.AddTorque(Vector3.forward * 0.1f);
+
+            // transform.Rotate(Vector3.forward * 0.1f);
             eastThrusterParticles.SetActive(true);
         } else {
             eastThrusterParticles.SetActive(false);
@@ -123,7 +127,9 @@ public class rocket : Agent
         if (discreteActions[3] == 1) {
             Debug.Log("South Thruster On");
             // rotate the rocket south
-            transform.Rotate(Vector3.right * -0.1f);
+            rb.AddTorque(Vector3.right * -0.1f);
+
+            // transform.Rotate(Vector3.right * -0.1f);
             southThrusterParticles.SetActive(true);
         } else {
             southThrusterParticles.SetActive(false);
@@ -132,7 +138,9 @@ public class rocket : Agent
         if (discreteActions[4] == 1) {
             Debug.Log("West Thruster On");
             // rotate the rocket west
-            transform.Rotate(Vector3.forward * -0.1f);
+            rb.AddTorque(Vector3.forward * -0.1f);
+
+            // transform.Rotate(Vector3.forward * -0.1f);
             westThrusterParticles.SetActive(true);
         } else {
             westThrusterParticles.SetActive(false);

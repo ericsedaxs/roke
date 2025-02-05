@@ -1,0 +1,66 @@
+{
+    "rocket landing": {
+        "checkpoints": [
+            {
+                "steps": 349986,
+                "file_path": "results\\GPULanding2\\rocket landing\\rocket landing-349986.onnx",
+                "reward": -10.692499958211556,
+                "creation_time": 1738797636.177126,
+                "auxillary_file_paths": [
+                    "results\\GPULanding2\\rocket landing\\rocket landing-349986.pt"
+                ]
+            },
+            {
+                "steps": 399965,
+                "file_path": "results\\GPULanding2\\rocket landing\\rocket landing-399965.onnx",
+                "reward": -12.570370306916258,
+                "creation_time": 1738797776.8391266,
+                "auxillary_file_paths": [
+                    "results\\GPULanding2\\rocket landing\\rocket landing-399965.pt"
+                ]
+            },
+            {
+                "steps": 449945,
+                "file_path": "results\\GPULanding2\\rocket landing\\rocket landing-449945.onnx",
+                "reward": -12.614782578352353,
+                "creation_time": 1738797922.8791246,
+                "auxillary_file_paths": [
+                    "results\\GPULanding2\\rocket landing\\rocket landing-449945.pt"
+                ]
+            },
+            {
+                "steps": 499994,
+                "file_path": "results\\GPULanding2\\rocket landing\\rocket landing-499994.onnx",
+                "reward": -11.266666652324298,
+                "creation_time": 1738798068.5306268,
+                "auxillary_file_paths": [
+                    "results\\GPULanding2\\rocket landing\\rocket landing-499994.pt"
+                ]
+            },
+            {
+                "steps": 500058,
+                "file_path": "results\\GPULanding2\\rocket landing\\rocket landing-500058.onnx",
+                "reward": -11.266666652324298,
+                "creation_time": 1738798068.672126,
+                "auxillary_file_paths": [
+                    "results\\GPULanding2\\rocket landing\\rocket landing-500058.pt"
+                ]
+            }
+        ],
+        "elo": -59.76164550365122,
+        "final_checkpoint": {
+            "steps": 500058,
+            "file_path": "results\\GPULanding2\\rocket landing.onnx",
+            "reward": -11.266666652324298,
+            "creation_time": 1738798068.672126,
+            "auxillary_file_paths": [
+                "results\\GPULanding2\\rocket landing\\rocket landing-500058.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.3.1+cpu"
+    }
+}
