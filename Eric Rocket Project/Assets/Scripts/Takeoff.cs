@@ -106,7 +106,8 @@ public class Takeoff : Agent
         if (discreteActions[1] == 1) {
             Debug.Log("North Thruster On");
             // rotate the rocket north
-            transform.Rotate(Vector3.right * 0.1f);
+            rb.AddTorque(Vector3.right * 0.1f);
+            // transform.Rotate(Vector3.right * 0.1f);
             northThrusterParticles.SetActive(true);
         } else {
             northThrusterParticles.SetActive(false);
@@ -115,7 +116,8 @@ public class Takeoff : Agent
         if (discreteActions[2] == 1) {
             Debug.Log("East Thruster On");
             // rotate the rocket east
-            transform.Rotate(Vector3.forward * 0.1f);
+            rb.AddTorque(Vector3.forward * 0.1f);
+            // transform.Rotate(Vector3.forward * 0.1f);
             eastThrusterParticles.SetActive(true);
         } else {
             eastThrusterParticles.SetActive(false);
@@ -124,7 +126,8 @@ public class Takeoff : Agent
         if (discreteActions[3] == 1) {
             Debug.Log("South Thruster On");
             // rotate the rocket south
-            transform.Rotate(Vector3.right * -0.1f);
+            rb.AddTorque(Vector3.right * -0.1f);
+            // transform.Rotate(Vector3.right * -0.1f);
             southThrusterParticles.SetActive(true);
         } else {
             southThrusterParticles.SetActive(false);
@@ -133,7 +136,8 @@ public class Takeoff : Agent
         if (discreteActions[4] == 1) {
             Debug.Log("West Thruster On");
             // rotate the rocket west
-            transform.Rotate(Vector3.forward * -0.1f);
+            rb.AddTorque(Vector3.forward * -0.1f);
+            // transform.Rotate(Vector3.forward * -0.1f);
             westThrusterParticles.SetActive(true);
         } else {
             westThrusterParticles.SetActive(false);
@@ -182,7 +186,7 @@ public class Takeoff : Agent
             // check vertical speed
 
             if (currentVelocity.y < targetSpeed) {
-                SetReward(10.0f);
+                AddReward(10.0f);
                 Debug.Log("Reached goal with velocity o: " + currentVelocity.y + " m/s");
                 indicator.GetComponent<MeshRenderer>().material = successMaterial;
                 EndEpisode();
@@ -224,7 +228,7 @@ public class Takeoff : Agent
             // lastY = 1000f;
             // EndEpisode();
         } else if (transform.localPosition.y > (lastY)) {
-            // AddReward(0.01f);
+            AddReward(0.005f);
         }
 
         if (transform.localPosition.y < 0f) {
