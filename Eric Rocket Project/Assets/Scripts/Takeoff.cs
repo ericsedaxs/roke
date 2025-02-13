@@ -37,14 +37,21 @@ public class Takeoff : Agent
     float lastY = 1000f;
     float targetSpeed = 15.0f;
 
+    float highestHeight = 0;
 
     private float lastXFromPlatform = 0;
     private float lastZFromPlatform = 0;
     private float lastXRotation = 0;
     private float lastZRotation = 0;
 
+    // start time
+    private float startTime;
+
     public override void OnEpisodeBegin()
     {
+        startTime = Time.time;
+        highestHeight = transform.localPosition.y;
+
         if (powerInput != null && massInput != null) {
             powerInput.text = power.ToString();
             massInput.text = rb.mass.ToString();
@@ -55,6 +62,7 @@ public class Takeoff : Agent
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(0, 0.5f, 0);
+        platform.transform.localPosition = new Vector3(Random.Range(-200f, 200f), Random.Range(500f, 2000f), Random.Range(-200f, 200f));
         // TODO: set the lastXFromPlatform and lastZFromPlatform to the current distance the platform
         transform.localRotation = Quaternion.identity;
         previousPosition = transform.localPosition;
@@ -90,7 +98,7 @@ public class Takeoff : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
-        Debug.Log($"Discrete Actions: {discreteActions[0]} {discreteActions[1]} {discreteActions[2]} {discreteActions[3]} {discreteActions[4]}");
+        // Debug.Log($"Discrete Actions: {discreteActions[0]} {discreteActions[1]} {discreteActions[2]} {discreteActions[3]} {discreteActions[4]}");
         if (discreteActions[0] == 1) {
             thrusterOn = true;
             mainThrusterParticles.SetActive(true);
@@ -186,7 +194,10 @@ public class Takeoff : Agent
             // check vertical speed
 
             if (currentVelocity.y < targetSpeed) {
-                AddReward(10.0f);
+                // calculate time bonus
+                float timeBonus = (1.0f - ((Time.time - startTime) / 60)) * 5;
+
+                AddReward(10.0f + timeBonus);
                 Debug.Log("Reached goal with velocity o: " + currentVelocity.y + " m/s");
                 indicator.GetComponent<MeshRenderer>().material = successMaterial;
                 EndEpisode();
@@ -196,11 +207,23 @@ public class Takeoff : Agent
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
                 EndEpisode();
             }
-        }
+        } 
+        // else if (collision.gameObject.CompareTag("Ground") && highestHeight > 10) {
+        //     Debug.Log("Crashed because of hitting the ground");
+        //     AddReward(-15.0f);
+        //     indicator.GetComponent<MeshRenderer>().material = failMaterial;
+        //     highestHeight = 0;
+        //     lastY = 0f;
+        //     EndEpisode();
+        // }
     }
 
     // Update is called once per frame
     void FixedUpdate() {
+
+        transform.rotation = Quaternion.LookRotation(platform.transform.position - transform.position, Vector3.up);
+        // add an offset of +90, 0 ,0 to make the rocket upright
+        transform.Rotate(90, 0, 0);
 
         if (powerInput != null && massInput != null) {
             power = float.Parse(powerInput.text);
@@ -249,13 +272,24 @@ public class Takeoff : Agent
             AddReward(-0.01f);
         }
 
-        if (x_distance > 50 || z_distance > 50) {
+        if (x_distance > 200 || z_distance > 200) {
             Debug.Log("Failed because of going too far away from the platform");
             AddReward(-15.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
             EndEpisode();
         }
+
+
+        // check if the rocket fell too much
+        // if (transform.localPosition.y > 2 && transform.localPosition.y < (highestHeight - 5)) {
+        //     Debug.Log("Failed because of falling too much");
+        //     AddReward(-15.0f);
+        //     indicator.GetComponent<MeshRenderer>().material = failMaterial;
+        //     highestHeight = 0;
+        //     lastY = 0f;
+        //     EndEpisode();
+        // }
 
 
         // check the rotation if in the safe are to make it straight
@@ -267,6 +301,11 @@ public class Takeoff : Agent
 
 
         lastY = transform.localPosition.y;
+
+        if (lastY > highestHeight) {
+            highestHeight = lastY;
+        }
+
         lastXFromPlatform = x_distance;
         lastZFromPlatform = z_distance;
         lastXRotation = transform.localRotation.x;

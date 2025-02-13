@@ -24,7 +24,7 @@ public class TitleRocket : MonoBehaviour
     {
         // look at target, but from the top of the rocket instead of the side of the rocket
         
-        Quaternion lookRotation = Quaternion.LookRotation(target.position - transform.position);
+        // Quaternion lookRotation = Quaternion.LookRotation(target.position - transform.position);
 
         transform.rotation = Quaternion.LookRotation(target.position - transform.position, Vector3.up);
         
