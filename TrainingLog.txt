@@ -1,1 +1,162 @@
-Landing2
+Takeoff6
+(venv) Andrews-MacBook-Pro:Eric Rocket Project andrewpark$ mlagents-learn config/config.yaml --run-id=Takeoff6 --initialize-from=Takeoff5
+[WARNING] 'encoding_size' was deprecated for RewardSignals. Please use network_settings.
+[WARNING] 'encoding_size' was deprecated for RewardSignals. Please use network_settings.
+
+            ┐  ╖
+        ╓╖╬│╡  ││╬╖╖
+    ╓╖╬│││││┘  ╬│││││╬╖
+ ╖╬│││││╬╜        ╙╬│││││╖╖                               ╗╗╗
+ ╬╬╬╬╖││╦╖        ╖╬││╗╣╣╣╬      ╟╣╣╬    ╟╣╣╣             ╜╜╜  ╟╣╣
+ ╬╬╬╬╬╬╬╬╖│╬╖╖╓╬╪│╓╣╣╣╣╣╣╣╬      ╟╣╣╬    ╟╣╣╣ ╒╣╣╖╗╣╣╣╗   ╣╣╣ ╣╣╣╣╣╣ ╟╣╣╖   ╣╣╣
+ ╬╬╬╬┐  ╙╬╬╬╬│╓╣╣╣╝╜  ╫╣╣╣╬      ╟╣╣╬    ╟╣╣╣ ╟╣╣╣╙ ╙╣╣╣  ╣╣╣ ╙╟╣╣╜╙  ╫╣╣  ╟╣╣
+ ╬╬╬╬┐     ╙╬╬╣╣      ╫╣╣╣╬      ╟╣╣╬    ╟╣╣╣ ╟╣╣╬   ╣╣╣  ╣╣╣  ╟╣╣     ╣╣╣┌╣╣╜
+ ╬╬╬╜       ╬╬╣╣      ╙╝╣╣╬      ╙╣╣╣╗╖╓╗╣╣╣╜ ╟╣╣╬   ╣╣╣  ╣╣╣  ╟╣╣╦╓    ╣╣╣╣╣
+ ╙   ╓╦╖    ╬╬╣╣   ╓╗╗╖            ╙╝╣╣╣╣╝╜   ╘╝╝╜   ╝╝╝  ╝╝╝   ╙╣╣╣    ╟╣╣╣
+   ╩╬╬╬╬╬╬╦╦╬╬╣╣╗╣╣╣╣╣╣╣╝                                             ╫╣╣╣╣
+      ╙╬╬╬╬╬╬╬╣╣╣╣╣╣╝╜
+          ╙╬╬╬╣╣╣╜
+             ╙
+        
+ Version information:
+  ml-agents: 1.1.0,
+  ml-agents-envs: 1.1.0,
+  Communicator API: 1.5.0,
+  PyTorch: 2.5.1
+[INFO] Listening on port 5004. Start training by pressing the Play button in the Unity Editor.
+[INFO] Connected to Unity environment with package version 3.0.0 and communication version 1.5.0
+[INFO] Connected new brain: rocket takeoff?team=0
+[INFO] Hyperparameters for behavior name rocket takeoff: 
+        trainer_type:   ppo
+        hyperparameters:
+          batch_size:   1024
+          buffer_size:  10240
+          learning_rate:        0.0003
+          beta: 0.005
+          epsilon:      0.2
+          lambd:        0.95
+          num_epoch:    3
+          shared_critic:        False
+          learning_rate_schedule:       linear
+          beta_schedule:        constant
+          epsilon_schedule:     linear
+        checkpoint_interval:    50000
+        network_settings:
+          normalize:    False
+          hidden_units: 128
+          num_layers:   2
+          vis_encode_type:      simple
+          memory:
+            sequence_length:    64
+            memory_size:        256
+          goal_conditioning_type:       hyper
+          deterministic:        False
+        reward_signals:
+          extrinsic:
+            gamma:      0.99
+            strength:   1.0
+            network_settings:
+              normalize:        False
+              hidden_units:     128
+              num_layers:       2
+              vis_encode_type:  simple
+              memory:   None
+              goal_conditioning_type:   hyper
+              deterministic:    False
+          curiosity:
+            gamma:      0.99
+            strength:   0.02
+            network_settings:
+              normalize:        False
+              hidden_units:     256
+              num_layers:       2
+              vis_encode_type:  simple
+              memory:   None
+              goal_conditioning_type:   hyper
+              deterministic:    False
+            learning_rate:      0.0003
+            encoding_size:      256
+          gail:
+            gamma:      0.99
+            strength:   0.5
+            network_settings:
+              normalize:        False
+              hidden_units:     128
+              num_layers:       2
+              vis_encode_type:  simple
+              memory:   None
+              goal_conditioning_type:   hyper
+              deterministic:    False
+            learning_rate:      0.0003
+            encoding_size:      128
+            use_actions:        False
+            use_vail:   False
+            demo_path:  demo/Takeoff4.demo
+        init_path:      results/Takeoff5/rocket takeoff/checkpoint.pt
+        keep_checkpoints:       5
+        even_checkpoints:       False
+        max_steps:      500000
+        time_horizon:   64
+        summary_freq:   20000
+        threaded:       False
+        self_play:
+          save_steps:   50000
+          team_change:  100000
+          swap_steps:   2000
+          window:       10
+          play_against_latest_model_ratio:      0.5
+          initial_elo:  1200.0
+        behavioral_cloning:
+          demo_path:    demo/Takeoff4.demo
+          steps:        150000
+          strength:     0.5
+          samples_per_update:   0
+          num_epoch:    3
+          batch_size:   512
+[INFO] Initializing from results/Takeoff5/rocket takeoff/checkpoint.pt.
+/Users/andrewpark/Student Projects/roke/Eric Rocket Project/venv/lib/python3.10/site-packages/mlagents/trainers/model_saver/torch_model_saver.py:91: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  saved_state_dict = torch.load(load_path)
+[INFO] Starting training from step 0 and saving to results/Takeoff6/rocket takeoff.
+/Users/andrewpark/Student Projects/roke/Eric Rocket Project/venv/lib/python3.10/site-packages/mlagents/trainers/torch_entities/utils.py:289: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3687.)
+  torch.nn.functional.one_hot(_act.T, action_size[i]).float()
+[INFO] rocket takeoff. Step: 20000. Time Elapsed: 40.329 s. Mean Reward: -21.514. Std of Reward: 0.884. Training. ELO: 1176.026.
+[INFO] rocket takeoff. Step: 40000. Time Elapsed: 68.045 s. Mean Reward: -23.451. Std of Reward: 3.404. Training. ELO: 1137.575.
+/Users/andrewpark/Student Projects/roke/Eric Rocket Project/venv/lib/python3.10/site-packages/torch/onnx/symbolic_opset9.py:4279: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with LSTM can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  warnings.warn(
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-49981.onnx
+[INFO] rocket takeoff. Step: 60000. Time Elapsed: 93.000 s. Mean Reward: -11.753. Std of Reward: 11.873. Training. ELO: 1114.229.
+[INFO] rocket takeoff. Step: 80000. Time Elapsed: 120.134 s. Mean Reward: -16.052. Std of Reward: 17.157. Training. ELO: 1093.548.
+[INFO] rocket takeoff. Step: 100000. Time Elapsed: 146.514 s. Mean Reward: -15.551. Std of Reward: 16.719. Training. ELO: 1067.944.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-99954.onnx
+[INFO] rocket takeoff. Step: 120000. Time Elapsed: 173.493 s. Mean Reward: -21.694. Std of Reward: 0.553. Training. ELO: 1053.748.
+[INFO] rocket takeoff. Step: 140000. Time Elapsed: 199.697 s. Mean Reward: -12.719. Std of Reward: 9.869. Training. ELO: 1041.777.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-149987.onnx
+[INFO] rocket takeoff. Step: 160000. Time Elapsed: 227.178 s. Mean Reward: -7.124. Std of Reward: 12.090. Training. ELO: 1020.670.
+[INFO] rocket takeoff. Step: 180000. Time Elapsed: 254.507 s. Mean Reward: -8.305. Std of Reward: 11.218. Training. ELO: 998.134.
+[INFO] rocket takeoff. Step: 200000. Time Elapsed: 280.442 s. Mean Reward: -12.153. Std of Reward: 13.454. Training. ELO: 980.763.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-199985.onnx
+[INFO] rocket takeoff. Step: 220000. Time Elapsed: 306.111 s. Mean Reward: -16.760. Std of Reward: 6.325. Training. ELO: 970.029.
+[INFO] rocket takeoff. Step: 240000. Time Elapsed: 333.892 s. Mean Reward: -5.632. Std of Reward: 5.567. Training. ELO: 951.395.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-249938.onnx
+[INFO] rocket takeoff. Step: 260000. Time Elapsed: 361.789 s. Mean Reward: -6.817. Std of Reward: 9.419. Training. ELO: 919.713.
+[INFO] rocket takeoff. Step: 280000. Time Elapsed: 389.484 s. Mean Reward: -6.386. Std of Reward: 8.941. Training. ELO: 884.579.
+[INFO] rocket takeoff. Step: 300000. Time Elapsed: 418.379 s. Mean Reward: -5.839. Std of Reward: 6.287. Training. ELO: 854.728.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-299973.onnx
+[INFO] rocket takeoff. Step: 320000. Time Elapsed: 443.741 s. Mean Reward: -21.117. Std of Reward: 0.816. Training. ELO: 837.828.
+[INFO] rocket takeoff. Step: 340000. Time Elapsed: 471.175 s. Mean Reward: -4.458. Std of Reward: 11.890. Training. ELO: 825.244.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-349942.onnx
+[INFO] rocket takeoff. Step: 360000. Time Elapsed: 499.223 s. Mean Reward: -11.557. Std of Reward: 12.549. Training. ELO: 800.134.
+[INFO] rocket takeoff. Step: 380000. Time Elapsed: 526.788 s. Mean Reward: -11.409. Std of Reward: 15.727. Training. ELO: 772.850.
+[INFO] rocket takeoff. Step: 400000. Time Elapsed: 553.341 s. Mean Reward: -14.447. Std of Reward: 16.278. Training. ELO: 755.869.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-399990.onnx
+[INFO] rocket takeoff. Step: 420000. Time Elapsed: 581.722 s. Mean Reward: -21.430. Std of Reward: 0.943. Training. ELO: 735.586.
+[INFO] rocket takeoff. Step: 440000. Time Elapsed: 609.600 s. Mean Reward: -27.564. Std of Reward: 4.608. Training. ELO: 719.331.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-449944.onnx
+[INFO] rocket takeoff. Step: 460000. Time Elapsed: 637.672 s. Mean Reward: -13.464. Std of Reward: 17.314. Training. ELO: 705.870.
+[INFO] rocket takeoff. Step: 480000. Time Elapsed: 665.724 s. Mean Reward: -9.304. Std of Reward: 16.870. Training. ELO: 689.764.
+[INFO] rocket takeoff. Step: 500000. Time Elapsed: 692.829 s. Mean Reward: -19.976. Std of Reward: 17.682. Training. ELO: 670.146.
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-499943.onnx
+[INFO] Exported results/Takeoff6/rocket takeoff/rocket takeoff-500007.onnx
+[INFO] Copied results/Takeoff6/rocket takeoff/rocket takeoff-500007.onnx to results/Takeoff6/rocket takeoff.onnx.
+
+Takeoff7: upped the layers to 3 and nodes to 256

@@ -221,9 +221,12 @@ public class Takeoff : Agent
     // Update is called once per frame
     void FixedUpdate() {
 
-        transform.rotation = Quaternion.LookRotation(platform.transform.position - transform.position, Vector3.up);
-        // add an offset of +90, 0 ,0 to make the rocket upright
-        transform.Rotate(90, 0, 0);
+        if (transform.localPosition.y > 5f){
+            transform.rotation = Quaternion.LookRotation(platform.transform.position - transform.position, Vector3.up);
+            // add an offset of +90, 0 ,0 to make the rocket upright
+            transform.Rotate(90, 0, 0);
+        }
+        
 
         if (powerInput != null && massInput != null) {
             power = float.Parse(powerInput.text);

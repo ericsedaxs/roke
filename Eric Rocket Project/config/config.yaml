@@ -22,8 +22,8 @@ behaviors:
     network_settings:
       vis_encode_type: simple
       normalize: false
-      hidden_units: 128
-      num_layers: 2
+      hidden_units: 256
+      num_layers: 3
       # memory
       memory:
         sequence_length: 64
@@ -40,7 +40,7 @@ behaviors:
 
     # behavior cloning
     behavioral_cloning:
-      demo_path: "demo/Takeoff1.demo"
+      demo_path: "demo/Takeoff4.demo"
       strength: 0.5
       steps: 150000
       batch_size: 512
@@ -65,7 +65,7 @@ behaviors:
         strength: 0.5
         gamma: 0.99
         encoding_size: 128
-        demo_path: "demo/Takeoff1.demo"
+        demo_path: "demo/Takeoff4.demo"
         learning_rate: 3.0e-4
         use_actions: false
         use_vail: false
