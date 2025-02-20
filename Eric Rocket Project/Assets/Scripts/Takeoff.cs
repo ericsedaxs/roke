@@ -221,6 +221,8 @@ public class Takeoff : Agent
     // Update is called once per frame
     void FixedUpdate() {
 
+        // TODO: add check for if the rocket is slowing down when close to goal
+
         if (transform.localPosition.y > 5f){
             transform.rotation = Quaternion.LookRotation(platform.transform.position - transform.position, Vector3.up);
             // add an offset of +90, 0 ,0 to make the rocket upright

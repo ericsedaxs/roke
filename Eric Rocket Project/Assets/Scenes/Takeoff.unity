@@ -4144,6 +4144,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Takeoff Environment (81)
       objectReference: {fileID: 0}
+    - target: {fileID: 6190788058463481221, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10251,12 +10255,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4066249006280129240, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
+      propertyPath: Record
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066249006280129240, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4066249006280129240, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
       propertyPath: DemonstrationName
-      value: Takeoff4
+      value: Takeoff5
       objectReference: {fileID: 0}
     - target: {fileID: 6190788058463481221, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
       propertyPath: m_Name
