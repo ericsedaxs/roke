@@ -35,7 +35,7 @@ public class Takeoff : Agent
     public TMP_InputField massInput;
 
     float lastY = 1000f;
-    float targetSpeed = 15.0f;
+    float targetSpeed = 25.0f;
 
     float highestHeight = 0;
 
@@ -193,18 +193,26 @@ public class Takeoff : Agent
         if (collision.gameObject.CompareTag("Goal")) {
             // check vertical speed
 
-            if (currentVelocity.y < targetSpeed) {
+            // overall speed
+            float overallSpeed = currentVelocity.magnitude;
+
+            if (overallSpeed < targetSpeed) {
                 // calculate time bonus
                 float timeBonus = (1.0f - ((Time.time - startTime) / 60)) * 5;
 
                 AddReward(10.0f + timeBonus);
-                Debug.Log("Reached goal with velocity o: " + currentVelocity.y + " m/s");
+                Debug.Log("Reached goal with velocity of: " + overallSpeed + " m/s");
+                // Debug.Log($"Success Overall Speed: {overallSpeed} m/s");
                 indicator.GetComponent<MeshRenderer>().material = successMaterial;
+                Stats.Instance.successCount++;
                 EndEpisode();
             } else {
                 AddReward(-10.0f);
-                Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
+                Debug.Log("Crashed with a velocity of: " + overallSpeed + " m/s");
+                // Debug.Log($"Fail Overall Speed: {overallSpeed} m/s");
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
+                Stats.Instance.crashCount++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
         } 
@@ -222,6 +230,22 @@ public class Takeoff : Agent
     void FixedUpdate() {
 
         // TODO: add check for if the rocket is slowing down when close to goal
+        float distanceToGoal = Vector3.Distance(transform.localPosition, platform.transform.localPosition);
+        if (distanceToGoal < 100f) {
+            // check if the rocket is slowing down
+            float lastVelocity = currentVelocity.magnitude;
+            float currentVelocityMagnitude = ((transform.localPosition - previousPosition) / Time.deltaTime).magnitude;
+
+            if (currentVelocityMagnitude < lastVelocity) {
+                // add a reward for slowing down
+                AddReward(0.01f);
+            } else {
+                // add a punishment for not slowing down
+                AddReward(-0.01f);
+            }
+
+        }
+
 
         if (transform.localPosition.y > 5f){
             transform.rotation = Quaternion.LookRotation(platform.transform.position - transform.position, Vector3.up);
@@ -239,12 +263,13 @@ public class Takeoff : Agent
         // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
         previousPosition = transform.localPosition;
 
-        // check if the rocket is below the platform
+        // check if the rocket is above the goal
         if (transform.localPosition.y > (platform.transform.localPosition.y + 10)) {
             Debug.Log("Failed because of going above the target");
             AddReward(-15.0f);
             indicator.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 0f;
+            Stats.Instance.failureCount++;
             EndEpisode();
         }
 
@@ -264,6 +289,7 @@ public class Takeoff : Agent
             SetReward(-20.0f);
             indicator.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 0f;
+            Stats.Instance.failureCount++;
             EndEpisode();
         }
 
@@ -282,6 +308,7 @@ public class Takeoff : Agent
             AddReward(-15.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
+            Stats.Instance.failureCount++;
             EndEpisode();
         }
 
