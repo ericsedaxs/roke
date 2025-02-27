@@ -43,6 +43,8 @@ public class Takeoff : Agent
     private float lastZFromPlatform = 0;
     private float lastXRotation = 0;
     private float lastZRotation = 0;
+    private float lastDistance = 1000f;
+    private float closestDistance = 1000f;
 
     // start time
     private float startTime;
@@ -66,6 +68,9 @@ public class Takeoff : Agent
         // TODO: set the lastXFromPlatform and lastZFromPlatform to the current distance the platform
         transform.localRotation = Quaternion.identity;
         previousPosition = transform.localPosition;
+
+        lastDistance = Vector3.Distance(transform.localPosition, platform.transform.localPosition);
+        closestDistance = lastDistance;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -112,40 +117,49 @@ public class Takeoff : Agent
         }
 
         if (discreteActions[1] == 1) {
-            Debug.Log("North Thruster On");
+            // Debug.Log("North Thruster On");
             // rotate the rocket north
-            rb.AddTorque(Vector3.right * 0.1f);
+            // rb.AddTorque(Vector3.right * 0.1f);
             // transform.Rotate(Vector3.right * 0.1f);
+
+            // alternative: add force pushing rocket south
+            rb.AddForce(transform.forward * power * 0.1f);
             northThrusterParticles.SetActive(true);
         } else {
             northThrusterParticles.SetActive(false);
         }
 
         if (discreteActions[2] == 1) {
-            Debug.Log("East Thruster On");
+            // Debug.Log("East Thruster On");
             // rotate the rocket east
-            rb.AddTorque(Vector3.forward * 0.1f);
+            // rb.AddTorque(Vector3.forward * 0.1f);
             // transform.Rotate(Vector3.forward * 0.1f);
+            // alternative: add force pushing rocket east
+            rb.AddForce(-transform.right * power * 0.1f);
             eastThrusterParticles.SetActive(true);
         } else {
             eastThrusterParticles.SetActive(false);
         }
 
         if (discreteActions[3] == 1) {
-            Debug.Log("South Thruster On");
+            // Debug.Log("South Thruster On");
             // rotate the rocket south
-            rb.AddTorque(Vector3.right * -0.1f);
+            // rb.AddTorque(Vector3.right * -0.1f);
             // transform.Rotate(Vector3.right * -0.1f);
+            // alternative: add force pushing rocket north
+            rb.AddForce(-transform.forward * power * 0.1f);
             southThrusterParticles.SetActive(true);
         } else {
             southThrusterParticles.SetActive(false);
         }
 
         if (discreteActions[4] == 1) {
-            Debug.Log("West Thruster On");
+            // Debug.Log("West Thruster On");
             // rotate the rocket west
-            rb.AddTorque(Vector3.forward * -0.1f);
+            // rb.AddTorque(Vector3.forward * -0.1f);
             // transform.Rotate(Vector3.forward * -0.1f);
+            // alternative: add force pushing rocket west
+            rb.AddForce(transform.right * power * 0.1f);
             westThrusterParticles.SetActive(true);
         } else {
             westThrusterParticles.SetActive(false);
@@ -201,14 +215,14 @@ public class Takeoff : Agent
                 float timeBonus = (1.0f - ((Time.time - startTime) / 60)) * 5;
 
                 AddReward(10.0f + timeBonus);
-                Debug.Log("Reached goal with velocity of: " + overallSpeed + " m/s");
+                Debug.Log("Reached goal at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds" + " Time Bonus: " + timeBonus);
                 // Debug.Log($"Success Overall Speed: {overallSpeed} m/s");
                 indicator.GetComponent<MeshRenderer>().material = successMaterial;
                 Stats.Instance.successCount++;
                 EndEpisode();
             } else {
                 AddReward(-10.0f);
-                Debug.Log("Crashed with a velocity of: " + overallSpeed + " m/s");
+                Debug.Log("Crashed with at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds");
                 // Debug.Log($"Fail Overall Speed: {overallSpeed} m/s");
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
                 Stats.Instance.crashCount++;
@@ -229,6 +243,17 @@ public class Takeoff : Agent
     // Update is called once per frame
     void FixedUpdate() {
 
+        // check if the rocket took too long and fail if past 60 seconds
+        // Debug.Log($"Time: {Time.time - startTime}");
+        if (Time.time - startTime > 60) {
+            Debug.Log("Failed because of taking too long");
+            AddReward(-20.0f);
+            indicator.GetComponent<MeshRenderer>().material = failMaterial;
+            lastY = 0f;
+            Stats.Instance.failureCount++;
+            EndEpisode();
+        }
+
         // TODO: add check for if the rocket is slowing down when close to goal
         float distanceToGoal = Vector3.Distance(transform.localPosition, platform.transform.localPosition);
         if (distanceToGoal < 100f) {
@@ -244,6 +269,26 @@ public class Takeoff : Agent
                 AddReward(-0.01f);
             }
 
+        }
+
+        // if the rocket is farther away than last frame, add a punishment
+        if (distanceToGoal > lastDistance) {
+            AddReward(-0.01f);
+        }
+        // outright fail if the current distance is 10m or more than the closest distance
+        if (distanceToGoal > closestDistance + 30f) {
+            Debug.Log("Failed because of going too far away from the platform");
+            AddReward(-15.0f);
+            indicator.GetComponent<MeshRenderer>().material = failMaterial;
+            lastY = 0f;
+            Stats.Instance.failureCount++;
+            EndEpisode();
+        }
+
+        lastDistance = distanceToGoal;
+
+        if (closestDistance < distanceToGoal) {
+            closestDistance = distanceToGoal;
         }
 
 
@@ -286,7 +331,7 @@ public class Takeoff : Agent
 
         if (transform.localPosition.y < 0f) {
             Debug.Log("Failed because of going too low");
-            SetReward(-20.0f);
+            SetReward(-30.0f);
             indicator.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 0f;
             Stats.Instance.failureCount++;
