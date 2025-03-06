@@ -1,16 +1,27 @@
 using UnityEngine;
+using Unity.Sentis;
+using Unity.MLAgents.Policies;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using TMPro;
 
-public class Takeoff : Agent
+public class CombinedHandler : Agent
 {
+    // Takeoff onnx model file
+    public ModelAsset takeoffModel;
+    // Landing onnx model file
+    public ModelAsset landingModel;
+
+    // Behavior parameters
+    public BehaviorParameters behaviorParameters;
+    public string currentMode = "takeoff";
+
 
     public float power = 100.0f;
     public Rigidbody rb;
     bool thrusterOn = false;
-    public GameObject platform;
+    public GameObject target;
     public GameObject indicator;
     public Material successMaterial;
     public Material failMaterial;
@@ -64,12 +75,12 @@ public class Takeoff : Agent
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(0, 0.5f, 0);
-        platform.transform.localPosition = new Vector3(Random.Range(-200f, 200f), Random.Range(500f, 2000f), Random.Range(-200f, 200f));
+        target.transform.localPosition = new Vector3(UnityEngine.Random.Range(-200f, 200f), UnityEngine.Random.Range(500f, 2000f), UnityEngine.Random.Range(-200f, 200f));
         // TODO: set the lastXFromPlatform and lastZFromPlatform to the current distance the platform
         transform.localRotation = Quaternion.identity;
         previousPosition = transform.localPosition;
 
-        lastDistance = Vector3.Distance(transform.localPosition, platform.transform.localPosition);
+        lastDistance = Vector3.Distance(transform.localPosition, target.transform.localPosition);
         closestDistance = lastDistance;
     }
 
@@ -94,7 +105,7 @@ public class Takeoff : Agent
         sensor.AddObservation(Physics.gravity); // 3
 
         // goal location
-        sensor.AddObservation(platform.transform.localPosition); // 3
+        sensor.AddObservation(target.transform.localPosition); // 3
 
         // target speed
         sensor.AddObservation(targetSpeed); // 1
@@ -204,7 +215,8 @@ public class Takeoff : Agent
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Goal")) {
+        if (currentMode == "takeoff") {
+            if (collision.gameObject.CompareTag("Goal")) {
             // check vertical speed
 
             // overall speed
@@ -223,7 +235,9 @@ public class Takeoff : Agent
                 // Debug.Log($"Success Overall Speed: {overallSpeed} m/s");
                 indicator.GetComponent<MeshRenderer>().material = successMaterial;
                 Stats.Instance.successCount++;
-                EndEpisode();
+                // EndEpisode();
+                // Instead of ending the episode, change modes to landing
+                SwitchModes();
             } else {
                 if (GetCumulativeReward() > 0) {
                     AddReward(-1 * GetCumulativeReward());
@@ -237,6 +251,24 @@ public class Takeoff : Agent
                 EndEpisode();
             }
         } 
+        } else if (currentMode == "landing") {
+            if (collision.gameObject.CompareTag("Goal")) {
+            // check vertical speed
+
+            if (currentVelocity.y >= targetSpeed) {
+                SetReward(10.0f);
+                Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
+                target.GetComponent<MeshRenderer>().material = successMaterial;
+                EndEpisode();
+            } else {
+                AddReward(-10.0f);
+                Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
+                target.GetComponent<MeshRenderer>().material = failMaterial;
+                EndEpisode();
+            }
+        }
+        }
+        
         // else if (collision.gameObject.CompareTag("Ground") && highestHeight > 10) {
         //     Debug.Log("Crashed because of hitting the ground");
         //     AddReward(-15.0f);
@@ -267,7 +299,7 @@ public class Takeoff : Agent
         }
 
         // TODO: add check for if the rocket is slowing down when close to goal
-        float distanceToGoal = Vector3.Distance(transform.localPosition, platform.transform.localPosition);
+        float distanceToGoal = Vector3.Distance(transform.localPosition, target.transform.localPosition);
         if (distanceToGoal < 100f) {
             // check if the rocket is slowing down
             float lastVelocity = currentVelocity.magnitude;
@@ -313,7 +345,7 @@ public class Takeoff : Agent
 
 
         if (transform.localPosition.y > 5f){
-            transform.rotation = Quaternion.LookRotation(platform.transform.position - transform.position, Vector3.up);
+            transform.rotation = Quaternion.LookRotation(target.transform.position - transform.position, Vector3.up);
             // add an offset of +90, 0 ,0 to make the rocket upright
             transform.Rotate(90, 0, 0);
         }
@@ -329,7 +361,7 @@ public class Takeoff : Agent
         previousPosition = transform.localPosition;
 
         // check if the rocket is above the goal
-        if (transform.localPosition.y > (platform.transform.localPosition.y + 10)) {
+        if (transform.localPosition.y > (target.transform.localPosition.y + 10)) {
             Debug.Log("Failed because of going above the target");
             if (GetCumulativeReward() > 0) {
                 AddReward(-1 * GetCumulativeReward());
@@ -368,8 +400,8 @@ public class Takeoff : Agent
 
 
         // check horizontal position of the rocket to platform
-        float x_distance = Mathf.Abs(transform.localPosition.x - platform.transform.localPosition.x);
-        float z_distance = Mathf.Abs(transform.localPosition.z - platform.transform.localPosition.z);
+        float x_distance = Mathf.Abs(transform.localPosition.x - target.transform.localPosition.x);
+        float z_distance = Mathf.Abs(transform.localPosition.z - target.transform.localPosition.z);
 
         if ((x_distance > 20 || z_distance > 20) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
             // add some punishment because the rocket is wandering away from the platform
@@ -382,7 +414,7 @@ public class Takeoff : Agent
                 AddReward(-1 * GetCumulativeReward());
             }
             AddReward(-15.0f);
-            platform.GetComponent<MeshRenderer>().material = failMaterial;
+            target.GetComponent<MeshRenderer>().material = failMaterial;
             lastY = 1000f;
             Stats.Instance.wanderCount++;
             Stats.Instance.failureCount++;
@@ -445,6 +477,16 @@ public class Takeoff : Agent
             falconHeavy.SetActive(true);
         }
     }
-}
 
-// https://github.com/gzrjzcx/ML-agents/blob/master/docs/Training-Imitation-Learning.md
+    public void SwitchModes() {
+        if (currentMode == "takeoff") {
+            currentMode = "landing";
+            behaviorParameters.Model = landingModel;
+            target = GameObject.Find("Platform");
+        } else {
+            currentMode = "takeoff";
+            behaviorParameters.Model = takeoffModel;
+            target = GameObject.Find("Goal");
+        }
+    }
+}

@@ -1002,8 +1002,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5604,6 +5604,11 @@ MonoBehaviour:
   successCount: 0
   failureCount: 0
   crashCount: 0
+  missedCount: 0
+  wanderCount: 0
+  wander2Count: 0
+  overtimeCount: 0
+  fallCount: 0
 --- !u!114 &826705164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15557,7 +15562,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4066249006280129240, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
       propertyPath: DemonstrationName
-      value: Takeoff6
+      value: Takeoff7
       objectReference: {fileID: 0}
     - target: {fileID: 6190788058463481221, guid: 96e7cac026bbe4cad8e0dcb71b0378ae, type: 3}
       propertyPath: m_Name
