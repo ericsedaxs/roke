@@ -16604,6 +16604,8 @@ MonoBehaviour:
   MaxStep: 0
   takeoffModel: {fileID: 5022602860645237092, guid: 71869adafa34642e3bd89eb4346faebb, type: 3}
   landingModel: {fileID: 5022602860645237092, guid: c187fe61cc9934b0390b0afe3d8f8638, type: 3}
+  behaviorParameters: {fileID: 4936362954241089052}
+  currentMode: takeoff
   power: 10000000
   rb: {fileID: 1100706825402493672}
   target: {fileID: 1781730815435760034}
@@ -21669,7 +21671,7 @@ GameObject:
   - component: {fileID: 4835920079633086824}
   - component: {fileID: 7715821685306746963}
   m_Layer: 0
-  m_Name: platform
+  m_Name: Platform
   m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -53,7 +53,7 @@ public class rocket : Agent
         lastY = 1000f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        transform.localPosition = new Vector3(0, 500f, 0);
+        transform.localPosition = new Vector3(Random.Range(-200f, 200f), Random.Range(500f, 2000f), Random.Range(-200f, 200f));
         // TODO: set the lastXFromPlatform and lastZFromPlatform to the current distance the platform
         transform.localRotation = Quaternion.identity;
         previousPosition = transform.localPosition;
@@ -103,44 +103,49 @@ public class rocket : Agent
         }
 
         if (discreteActions[1] == 1) {
-            Debug.Log("North Thruster On");
-            // rotate the rocket north with torque
-            rb.AddTorque(Vector3.right * 0.1f);
-
+            // Debug.Log("North Thruster On");
+            // rotate the rocket north
+            // rb.AddTorque(Vector3.right * 0.1f);
             // transform.Rotate(Vector3.right * 0.1f);
+
+            // alternative: add force pushing rocket south
+            rb.AddForce(transform.forward * power * 0.1f);
             northThrusterParticles.SetActive(true);
         } else {
             northThrusterParticles.SetActive(false);
         }
 
         if (discreteActions[2] == 1) {
-            Debug.Log("East Thruster On");
+            // Debug.Log("East Thruster On");
             // rotate the rocket east
-            rb.AddTorque(Vector3.forward * 0.1f);
-
+            // rb.AddTorque(Vector3.forward * 0.1f);
             // transform.Rotate(Vector3.forward * 0.1f);
+            // alternative: add force pushing rocket east
+            rb.AddForce(-transform.right * power * 0.1f);
             eastThrusterParticles.SetActive(true);
         } else {
             eastThrusterParticles.SetActive(false);
         }
 
         if (discreteActions[3] == 1) {
-            Debug.Log("South Thruster On");
+            // Debug.Log("South Thruster On");
             // rotate the rocket south
-            rb.AddTorque(Vector3.right * -0.1f);
-
+            // rb.AddTorque(Vector3.right * -0.1f);
             // transform.Rotate(Vector3.right * -0.1f);
+            // alternative: add force pushing rocket north
+            rb.AddForce(-transform.forward * power * 0.1f);
             southThrusterParticles.SetActive(true);
         } else {
             southThrusterParticles.SetActive(false);
         }
 
         if (discreteActions[4] == 1) {
-            Debug.Log("West Thruster On");
+            // Debug.Log("West Thruster On");
             // rotate the rocket west
-            rb.AddTorque(Vector3.forward * -0.1f);
-
+            // rb.AddTorque(Vector3.forward * -0.1f);
             // transform.Rotate(Vector3.forward * -0.1f);
+            // alternative: add force pushing rocket west
+            rb.AddForce(transform.right * power * 0.1f);
             westThrusterParticles.SetActive(true);
         } else {
             westThrusterParticles.SetActive(false);
@@ -205,6 +210,9 @@ public class rocket : Agent
     // Update is called once per frame
     void FixedUpdate() {
 
+        // keep the rocket upright
+        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+
         if (powerInput != null && massInput != null) {
             power = float.Parse(powerInput.text);
             rb.mass = float.Parse(massInput.text);
@@ -234,7 +242,7 @@ public class rocket : Agent
             // AddReward(0.01f);
         }
 
-        if (transform.localPosition.y > 550f) {
+        if (transform.localPosition.y > 2000f) {
             Debug.Log("Failed because of going too high");
             SetReward(-20.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
@@ -252,7 +260,7 @@ public class rocket : Agent
             AddReward(-0.01f);
         }
 
-        if (x_distance > 50 || z_distance > 50) {
+        if (x_distance > 400 || z_distance > 400) {
             Debug.Log("Failed because of going too far away from the platform");
             AddReward(-15.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;

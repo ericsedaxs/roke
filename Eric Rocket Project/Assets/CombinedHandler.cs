@@ -60,8 +60,17 @@ public class CombinedHandler : Agent
     // start time
     private float startTime;
 
+    void Start() {
+        // set initial model to takeoff model
+        behaviorParameters.Model = takeoffModel;
+    }
+
     public override void OnEpisodeBegin()
     {
+        if (currentMode == "landing") {
+            SwitchModes();
+        }
+
         startTime = Time.time;
         highestHeight = transform.localPosition.y;
 
@@ -217,56 +226,66 @@ public class CombinedHandler : Agent
     {
         if (currentMode == "takeoff") {
             if (collision.gameObject.CompareTag("Goal")) {
-            // check vertical speed
+                // check vertical speed
 
-            // overall speed
-            float overallSpeed = currentVelocity.magnitude;
+                // overall speed
+                float overallSpeed = currentVelocity.magnitude;
 
-            if (overallSpeed < targetSpeed) {
-                // calculate time bonus
-                float timeBonus = (1.0f - ((Time.time - startTime) / 60)) * 5;
-
-                if (GetCumulativeReward() < 0) {
-                    AddReward(-1 * GetCumulativeReward());
-                }
-
-                AddReward(10.0f + timeBonus);
-                Debug.Log("Reached goal at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds" + " Time Bonus: " + timeBonus);
+                // === DEMO ===
+                Debug.Log("Reached goal at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds");
                 // Debug.Log($"Success Overall Speed: {overallSpeed} m/s");
-                indicator.GetComponent<MeshRenderer>().material = successMaterial;
-                Stats.Instance.successCount++;
+                target.GetComponent<MeshRenderer>().material = successMaterial;
+                // Stats.Instance.successCount++;
                 // EndEpisode();
                 // Instead of ending the episode, change modes to landing
                 SwitchModes();
-            } else {
-                if (GetCumulativeReward() > 0) {
-                    AddReward(-1 * GetCumulativeReward());
-                }
-                AddReward(-10.0f - (overallSpeed - targetSpeed));
-                Debug.Log("Crashed with at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds");
-                // Debug.Log($"Fail Overall Speed: {overallSpeed} m/s");
-                indicator.GetComponent<MeshRenderer>().material = failMaterial;
-                Stats.Instance.crashCount++;
-                Stats.Instance.failureCount++;
-                EndEpisode();
-            }
-        } 
+                // ============
+
+                // if (overallSpeed < targetSpeed) {
+                //     // calculate time bonus
+                //     float timeBonus = (1.0f - ((Time.time - startTime) / 60)) * 5;
+
+                //     if (GetCumulativeReward() < 0) {
+                //         AddReward(-1 * GetCumulativeReward());
+                //     }
+
+                //     AddReward(10.0f + timeBonus);
+                //     Debug.Log("Reached goal at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds" + " Time Bonus: " + timeBonus);
+                //     // Debug.Log($"Success Overall Speed: {overallSpeed} m/s");
+                //     indicator.GetComponent<MeshRenderer>().material = successMaterial;
+                //     // Stats.Instance.successCount++;
+                //     // EndEpisode();
+                //     // Instead of ending the episode, change modes to landing
+                //     SwitchModes();
+                // } else {
+                //     if (GetCumulativeReward() > 0) {
+                //         AddReward(-1 * GetCumulativeReward());
+                //     }
+                //     AddReward(-10.0f - (overallSpeed - targetSpeed));
+                //     Debug.Log("Crashed with at: " + overallSpeed + " m/s" + " Total Time: " + (Time.time - startTime) + " seconds");
+                //     // Debug.Log($"Fail Overall Speed: {overallSpeed} m/s");
+                //     indicator.GetComponent<MeshRenderer>().material = failMaterial;
+                //     // Stats.Instance.crashCount++;
+                //     // Stats.Instance.failureCount++;
+                //     EndEpisode();
+                // }
+            } 
         } else if (currentMode == "landing") {
             if (collision.gameObject.CompareTag("Goal")) {
             // check vertical speed
 
-            if (currentVelocity.y >= targetSpeed) {
-                SetReward(10.0f);
-                Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
-                target.GetComponent<MeshRenderer>().material = successMaterial;
-                EndEpisode();
-            } else {
-                AddReward(-10.0f);
-                Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
-                target.GetComponent<MeshRenderer>().material = failMaterial;
-                EndEpisode();
+                if (currentVelocity.y >= targetSpeed) {
+                    SetReward(10.0f);
+                    Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
+                    target.GetComponent<MeshRenderer>().material = successMaterial;
+                    EndEpisode();
+                } else {
+                    AddReward(-10.0f);
+                    Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
+                    target.GetComponent<MeshRenderer>().material = failMaterial;
+                    EndEpisode();
+                }
             }
-        }
         }
         
         // else if (collision.gameObject.CompareTag("Ground") && highestHeight > 10) {
@@ -281,172 +300,244 @@ public class CombinedHandler : Agent
 
     // Update is called once per frame
     void FixedUpdate() {
-        
-
-        // check if the rocket took too long and fail if past 60 seconds
-        // Debug.Log($"Time: {Time.time - startTime}");
-        if (Time.time - startTime > 60) {
-            Debug.Log("Failed because of taking too long");
-            if (GetCumulativeReward() > 0) {
-                AddReward(-1 * GetCumulativeReward());
-            }
-            AddReward(-30.0f);
-            indicator.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 0f;
-            Stats.Instance.overtimeCount++;
-            Stats.Instance.failureCount++;
-            EndEpisode();
-        }
-
-        // TODO: add check for if the rocket is slowing down when close to goal
-        float distanceToGoal = Vector3.Distance(transform.localPosition, target.transform.localPosition);
-        if (distanceToGoal < 100f) {
-            // check if the rocket is slowing down
-            float lastVelocity = currentVelocity.magnitude;
-            float currentVelocityMagnitude = ((transform.localPosition - previousPosition) / Time.deltaTime).magnitude;
-
-            if (currentVelocityMagnitude < lastVelocity) {
-                // add a reward for slowing down
-                AddReward(0.01f);
-            } else {
-                // add a punishment for not slowing down
-                AddReward(-0.01f);
-            }
-
-        }
-
-        // if the rocket is farther away than last frame, add a punishment
-        if (distanceToGoal > lastDistance) {
-            AddReward(-0.01f);
-        } else {
-            AddReward(0.005f);
-        }
-        // outright fail if the current distance is 10m or more than the closest distance
-        if (distanceToGoal > closestDistance + 30f) {
-            Debug.Log("Failed because of going too far away from the platform");
-
-            if (GetCumulativeReward() > 0) {
-                AddReward(-1 * GetCumulativeReward());
-            }
-
-            AddReward(-15.0f);
-            indicator.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 0f;
-            Stats.Instance.wander2Count++;
-            Stats.Instance.failureCount++;
-            EndEpisode();
-        }
-
-        lastDistance = distanceToGoal;
-
-        if (closestDistance < distanceToGoal) {
-            closestDistance = distanceToGoal;
-        }
-
-
-        if (transform.localPosition.y > 5f){
-            transform.rotation = Quaternion.LookRotation(target.transform.position - transform.position, Vector3.up);
-            // add an offset of +90, 0 ,0 to make the rocket upright
-            transform.Rotate(90, 0, 0);
-        }
-        
-
-        if (powerInput != null && massInput != null) {
-            power = float.Parse(powerInput.text);
-            rb.mass = float.Parse(massInput.text);
-        }
-
-        currentVelocity = (transform.localPosition - previousPosition) / Time.deltaTime;
-        // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
-        previousPosition = transform.localPosition;
-
-        // check if the rocket is above the goal
-        if (transform.localPosition.y > (target.transform.localPosition.y + 10)) {
-            Debug.Log("Failed because of going above the target");
-            if (GetCumulativeReward() > 0) {
-                AddReward(-1 * GetCumulativeReward());
-            }
-            AddReward(-15.0f);
-            indicator.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 0f;
-            Stats.Instance.missedCount++;
-            Stats.Instance.failureCount++;
-            EndEpisode();
-        }
-
-        // ignore in heuristic mode
-        // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
-        if (transform.localPosition.y < (lastY)) {
-            AddReward(-0.01f);
-            // platform.GetComponent<MeshRenderer>().material = failMaterial;
-            // lastY = 1000f;
-            // EndEpisode();
-        } else if (transform.localPosition.y > (lastY)) {
-            AddReward(0.005f);
-        }
-
-        if (transform.localPosition.y < 0f) {
-            Debug.Log("Failed because of going too low");
-            if (GetCumulativeReward() > 0) {
-                AddReward(-1 * GetCumulativeReward());
-            }
-            SetReward(-25.0f);
-            indicator.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 0f;
-            Stats.Instance.fallCount++;
-            Stats.Instance.failureCount++;
-            EndEpisode();
-        }
-
-
         // check horizontal position of the rocket to platform
         float x_distance = Mathf.Abs(transform.localPosition.x - target.transform.localPosition.x);
         float z_distance = Mathf.Abs(transform.localPosition.z - target.transform.localPosition.z);
 
-        if ((x_distance > 20 || z_distance > 20) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
-            // add some punishment because the rocket is wandering away from the platform
-            AddReward(-0.01f);
-        }
 
-        if (x_distance > 200 || z_distance > 200) {
-            Debug.Log("Failed because of going too far away from the platform");
-            if (GetCumulativeReward() > 0) {
-                AddReward(-1 * GetCumulativeReward());
+
+        if (currentMode == "takeoff") {
+            // check if the rocket took too long and fail if past 60 seconds
+            // Debug.Log($"Time: {Time.time - startTime}");
+            if (Time.time - startTime > 180) {
+                Debug.Log("Failed because of taking too long");
+                if (GetCumulativeReward() > 0) {
+                    AddReward(-1 * GetCumulativeReward());
+                }
+                AddReward(-30.0f);
+                indicator.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 0f;
+                // Stats.Instance.overtimeCount++;
+                // Stats.Instance.failureCount++;
+                EndEpisode();
             }
-            AddReward(-15.0f);
-            target.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 1000f;
-            Stats.Instance.wanderCount++;
-            Stats.Instance.failureCount++;
-            EndEpisode();
+
+            // TODO: add check for if the rocket is slowing down when close to goal
+            float distanceToGoal = Vector3.Distance(transform.localPosition, target.transform.localPosition);
+            if (distanceToGoal < 100f) {
+                // check if the rocket is slowing down
+                float lastVelocity = currentVelocity.magnitude;
+                float currentVelocityMagnitude = ((transform.localPosition - previousPosition) / Time.deltaTime).magnitude;
+
+                if (currentVelocityMagnitude < lastVelocity) {
+                    // add a reward for slowing down
+                    AddReward(0.01f);
+                } else {
+                    // add a punishment for not slowing down
+                    AddReward(-0.01f);
+                }
+
+            }
+
+            // if the rocket is farther away than last frame, add a punishment
+            if (distanceToGoal > lastDistance) {
+                AddReward(-0.01f);
+            } else {
+                AddReward(0.005f);
+            }
+            // outright fail if the current distance is 10m or more than the closest distance
+            if (distanceToGoal > closestDistance + 30f) {
+                Debug.Log("Failed because of going too far away from the platform");
+
+                if (GetCumulativeReward() > 0) {
+                    AddReward(-1 * GetCumulativeReward());
+                }
+
+                AddReward(-15.0f);
+                indicator.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 0f;
+                // Stats.Instance.wander2Count++;
+                // Stats.Instance.failureCount++;
+                EndEpisode();
+            }
+
+            lastDistance = distanceToGoal;
+
+            if (closestDistance < distanceToGoal) {
+                closestDistance = distanceToGoal;
+            }
+
+
+            if (transform.localPosition.y > 5f){
+                transform.rotation = Quaternion.LookRotation(target.transform.position - transform.position, Vector3.up);
+                // add an offset of +90, 0 ,0 to make the rocket upright
+                transform.Rotate(90, 0, 0);
+            }
+            
+
+            if (powerInput != null && massInput != null) {
+                power = float.Parse(powerInput.text);
+                rb.mass = float.Parse(massInput.text);
+            }
+
+            currentVelocity = (transform.localPosition - previousPosition) / Time.deltaTime;
+            // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
+            previousPosition = transform.localPosition;
+
+            // check if the rocket is above the goal
+            if (transform.localPosition.y > (target.transform.localPosition.y + 10)) {
+                Debug.Log("Failed because of going above the target");
+                if (GetCumulativeReward() > 0) {
+                    AddReward(-1 * GetCumulativeReward());
+                }
+                AddReward(-15.0f);
+                indicator.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 0f;
+                // Stats.Instance.missedCount++;
+                // Stats.Instance.failureCount++;
+                EndEpisode();
+            }
+
+            // ignore in heuristic mode
+            // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
+            if (transform.localPosition.y < (lastY)) {
+                AddReward(-0.01f);
+                // platform.GetComponent<MeshRenderer>().material = failMaterial;
+                // lastY = 1000f;
+                // EndEpisode();
+            } else if (transform.localPosition.y > (lastY)) {
+                AddReward(0.005f);
+            }
+
+            if (transform.localPosition.y < 0f) {
+                Debug.Log("Failed because of going too low");
+                if (GetCumulativeReward() > 0) {
+                    AddReward(-1 * GetCumulativeReward());
+                }
+                SetReward(-25.0f);
+                indicator.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 0f;
+                // Stats.Instance.fallCount++;
+                // Stats.Instance.failureCount++;
+                EndEpisode();
+            }
+
+
+
+            if ((x_distance > 20 || z_distance > 20) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
+                // add some punishment because the rocket is wandering away from the platform
+                AddReward(-0.01f);
+            }
+
+            if (x_distance > 200 || z_distance > 200) {
+                Debug.Log("Failed because of going too far away from the platform");
+                if (GetCumulativeReward() > 0) {
+                    AddReward(-1 * GetCumulativeReward());
+                }
+                AddReward(-15.0f);
+                target.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 1000f;
+                // Stats.Instance.wanderCount++;
+                // Stats.Instance.failureCount++;
+                EndEpisode();
+            }
+
+
+            // check if the rocket fell too much
+            // if (transform.localPosition.y > 2 && transform.localPosition.y < (highestHeight - 5)) {
+            //     Debug.Log("Failed because of falling too much");
+            //     AddReward(-15.0f);
+            //     indicator.GetComponent<MeshRenderer>().material = failMaterial;
+            //     highestHeight = 0;
+            //     lastY = 0f;
+            //     EndEpisode();
+            // }
+
+
+            // check the rotation if in the safe are to make it straight
+            // if (x_distance < 20 && z_distance < 20 && (transform.localRotation.x > 1 || transform.localRotation.z > 1)) {
+            //     if (lastXRotation < transform.localRotation.x || lastZRotation < transform.localRotation.z) {
+            //         AddReward(-0.01f);
+            //     }
+            // }
+
+
+            
+
+            if (lastY > highestHeight) {
+                highestHeight = lastY;
+            }
+
+        } else if (currentMode == "landing") {
+
+            if (powerInput != null && massInput != null) {
+                power = float.Parse(powerInput.text);
+                rb.mass = float.Parse(massInput.text);
+            }
+
+            currentVelocity = (transform.localPosition - previousPosition) / Time.deltaTime;
+            // Debug.Log($"{transform.localPosition} - {previousPosition} / {Time.deltaTime} = {currentVelocity}");
+            previousPosition = transform.localPosition;
+
+            // check if the rocket is below the platform
+            if (transform.localPosition.y < (target.transform.localPosition.y - 10)) {
+                Debug.Log("Failed because of going below the platform");
+                AddReward(-15.0f);
+                target.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 1000f;
+                EndEpisode();
+            }
+
+            // ignore in heuristic mode
+            // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
+            if (transform.localPosition.y > (lastY)) {
+                AddReward(-0.01f);
+                // platform.GetComponent<MeshRenderer>().material = failMaterial;
+                // lastY = 1000f;
+                // EndEpisode();
+            } else if (transform.localPosition.y < (lastY)) {
+                // AddReward(0.01f);
+            }
+
+            if (transform.localPosition.y > 2000f) {
+                Debug.Log("Failed because of going too high");
+                SetReward(-20.0f);
+                target.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 1000f;
+                EndEpisode();
+            }
+
+
+            // check horizontal position of the rocket to platform
+            // float x_distance = Mathf.Abs(transform.localPosition.x - platform.transform.localPosition.x);
+            // float z_distance = Mathf.Abs(transform.localPosition.z - platform.transform.localPosition.z);
+
+            if ((x_distance > 20 || z_distance > 20) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
+                // add some punishment because the rocket is wandering away from the platform
+                AddReward(-0.01f);
+            }
+
+            if (x_distance > 400 || z_distance > 400) {
+                Debug.Log("Failed because of going too far away from the platform");
+                AddReward(-15.0f);
+                target.GetComponent<MeshRenderer>().material = failMaterial;
+                lastY = 1000f;
+                EndEpisode();
+            }
+
+
+            // check the rotation if in the safe are to make it straight
+            if (x_distance < 20 && z_distance < 20 && (transform.localRotation.x > 1 || transform.localRotation.z > 1)) {
+                if (lastXRotation < transform.localRotation.x || lastZRotation < transform.localRotation.z) {
+                    AddReward(-0.01f);
+                }
+            }
         }
 
 
-        // check if the rocket fell too much
-        // if (transform.localPosition.y > 2 && transform.localPosition.y < (highestHeight - 5)) {
-        //     Debug.Log("Failed because of falling too much");
-        //     AddReward(-15.0f);
-        //     indicator.GetComponent<MeshRenderer>().material = failMaterial;
-        //     highestHeight = 0;
-        //     lastY = 0f;
-        //     EndEpisode();
-        // }
-
-
-        // check the rotation if in the safe are to make it straight
-        // if (x_distance < 20 && z_distance < 20 && (transform.localRotation.x > 1 || transform.localRotation.z > 1)) {
-        //     if (lastXRotation < transform.localRotation.x || lastZRotation < transform.localRotation.z) {
-        //         AddReward(-0.01f);
-        //     }
-        // }
 
 
         lastY = transform.localPosition.y;
-
-        if (lastY > highestHeight) {
-            highestHeight = lastY;
-        }
-
         lastXFromPlatform = x_distance;
         lastZFromPlatform = z_distance;
         lastXRotation = transform.localRotation.x;
@@ -483,6 +574,8 @@ public class CombinedHandler : Agent
             currentMode = "landing";
             behaviorParameters.Model = landingModel;
             target = GameObject.Find("Platform");
+            // set rocket velocity to zero
+            rb.linearVelocity = Vector3.zero;
         } else {
             currentMode = "takeoff";
             behaviorParameters.Model = takeoffModel;
