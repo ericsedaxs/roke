@@ -123,55 +123,83 @@ public class rocket : Agent
 
         // Step 4: determine which side thruster to turn on to push it towards the x and z of the platform
         if (x_distance > 10) {
+            int correctThruster = -1;
             if (transform.localPosition.x > platform.transform.localPosition.x) {
                 // rocket is to the right of the platform
                 // turn on the east thruster
-                discreteActions[2] = 1;
+                correctThruster = 2;
+                // discreteActions[2] = 1;
 
                 // if we are getting close but too fast, turn on the west thruster and shut off the east thruster (use x_difference so we are direction aware)
                 if (x_difference < 150 && x_velocity < -10) {
                     Debug.Log("Getting close but too fast, turning on west thruster");
-                    discreteActions[2] = 0;
-                    discreteActions[4] = 1;
+                    // discreteActions[2] = 0;
+                    // discreteActions[4] = 1;
+                    correctThruster = 4;
                 }
             } else {
                 // rocket is to the left of the platform
                 // turn on the west thruster
-                discreteActions[4] = 1;
+                correctThruster = 4;
+                // discreteActions[4] = 1;
 
                 // if we are getting close but too fast, turn on the east thruster
                 if (x_difference > -150 && x_velocity > 10) {
                     Debug.Log("Getting close but too fast, turning on east thruster");
-                    discreteActions[4] = 0;
-                    discreteActions[2] = 1;
+                    // discreteActions[4] = 0;
+                    // discreteActions[2] = 1;
+                    correctThruster = 2;
                 }
+            }
+
+            if (correctThruster == 2 && discreteActions[2] == 1 && discreteActions[4] == 0) {
+                AddReward(0.02f); // The correct thrusters are on/off
+            } else if (correctThruster == 4 && discreteActions[2] == 0 && discreteActions[4] == 1) {
+                AddReward(0.02f); // The correct thrusters are on/off
+            } else {
+                AddReward(-0.01f); // The correct thrusters are not on/off
+                // Debug.Log("Incorrect Thruster On");
             }
         }
 
         if (z_distance > 10) {
+            int correctThruster = -1;
             if (transform.localPosition.z > platform.transform.localPosition.z) {
                 // rocket is to the north of the platform
                 // turn on the south thruster
-                discreteActions[3] = 1;
+                // discreteActions[3] = 1;
+                correctThruster = 3;
 
                 // if we are getting close but too fast, turn on the north thruster
                 if (z_difference < 150 && z_velocity < -10) {
                     Debug.Log("Getting close but too fast, turning on north thruster");
-                    discreteActions[3] = 0;
-                    discreteActions[1] = 1;
+                    // discreteActions[3] = 0;
+                    // discreteActions[1] = 1;
+                    correctThruster = 1;
                 }
                 
             } else {
                 // rocket is to the south of the platform
                 // turn on the north thruster
-                discreteActions[1] = 1;
+                // discreteActions[1] = 1;
+                correctThruster = 1;
 
                 // if we are getting close but too fast, turn on the south thruster
                 if (z_difference > -150 && z_velocity > 10) {
                     Debug.Log("Getting close but too fast, turning on south thruster");
-                    discreteActions[1] = 0;
-                    discreteActions[3] = 1;
+                    // discreteActions[1] = 0;
+                    // discreteActions[3] = 1;
+                    correctThruster = 3;
                 }
+            }
+
+            if (correctThruster == 1 && discreteActions[1] == 1 && discreteActions[3] == 0) {
+                AddReward(0.02f); // The correct thrusters are on/off
+            } else if (correctThruster == 3 && discreteActions[1] == 0 && discreteActions[3] == 1) {
+                AddReward(0.02f); // The correct thrusters are on/off
+            } else {
+                AddReward(-0.01f); // The correct thrusters are not on/off
+                // Debug.Log("Incorrect Thruster On");
             }
         }
 
@@ -259,6 +287,78 @@ public class rocket : Agent
 
         if (Input.GetKey(KeyCode.D)) {
             actions[4] = 1;
+        }
+
+        // Check if valid thrusters
+        // Step 1: check the horizontal position of the rocket to the platform (both x and z)
+        float x_distance = Mathf.Abs(transform.localPosition.x - platform.transform.localPosition.x);
+        float x_difference = transform.localPosition.x - platform.transform.localPosition.x;
+        float z_distance = Mathf.Abs(transform.localPosition.z - platform.transform.localPosition.z);
+        float z_difference = transform.localPosition.z - platform.transform.localPosition.z;
+
+        // Debug.Log($"X Distance: {x_distance} Z Distance: {z_distance}");
+        // Debug.Log($"X Difference: {x_difference} Z Difference: {z_difference}");
+
+        // Step 2: check the rotation of the rocket about the y axis
+        float y_rotation = transform.localRotation.y;
+
+        // Step 3: check the velocity of the rocket (x and z)
+        float x_velocity = rb.linearVelocity.x;
+        float z_velocity = rb.linearVelocity.z;
+
+        // Debug.Log($"X Velocity: {x_velocity} Z Velocity: {z_velocity}");
+
+        // Step 4: determine which side thruster to turn on to push it towards the x and z of the platform
+        if (x_distance > 5) {
+            if (transform.localPosition.x > platform.transform.localPosition.x) {
+                // rocket is to the right of the platform
+                // turn on the east thruster
+                actions[2] = 1;
+
+                // if we are getting close but too fast, turn on the west thruster and shut off the east thruster (use x_difference so we are direction aware)
+                if (x_difference < 150 && x_velocity < -10) {
+                    Debug.Log("Getting close but too fast, turning on west thruster");
+                    actions[2] = 0;
+                    actions[4] = 1;                }
+            } else {
+                // rocket is to the left of the platform
+                // turn on the west thruster
+                actions[4] = 1;
+
+                // if we are getting close but too fast, turn on the east thruster
+                if (x_difference > -150 && x_velocity > 10) {
+                    Debug.Log("Getting close but too fast, turning on east thruster");
+                    actions[4] = 0;
+                    actions[2] = 1;
+                }
+            }
+        }
+
+        if (z_distance > 5) {
+            if (transform.localPosition.z > platform.transform.localPosition.z) {
+                // rocket is to the north of the platform
+                // turn on the south thruster
+                actions[3] = 1;
+
+                // if we are getting close but too fast, turn on the north thruster
+                if (z_difference < 150 && z_velocity < -10) {
+                    Debug.Log("Getting close but too fast, turning on north thruster");
+                    actions[3] = 0;
+                    actions[1] = 1;
+                }
+                
+            } else {
+                // rocket is to the south of the platform
+                // turn on the north thruster
+                actions[1] = 1;
+
+                // if we are getting close but too fast, turn on the south thruster
+                if (z_difference > -150 && z_velocity > 10) {
+                    Debug.Log("Getting close but too fast, turning on south thruster");
+                    actions[1] = 0;
+                    actions[3] = 1;
+                }
+            }
         }
     }
 
