@@ -33,7 +33,7 @@ public class rocket : Agent
     public TMP_InputField powerInput;
     public TMP_InputField massInput;
 
-    float lastY = 1000f;
+    float lastY = 2000f;
     float targetSpeed = -15.0f;
 
 
@@ -50,11 +50,13 @@ public class rocket : Agent
         }
         
 
-        lastY = 1000f;
+        lastY = 2000f;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localPosition = new Vector3(Random.Range(-200f, 200f), Random.Range(500f, 2000f), Random.Range(-200f, 200f));
         // TODO: set the lastXFromPlatform and lastZFromPlatform to the current distance the platform
+        lastXFromPlatform = Mathf.Abs(transform.localPosition.x - platform.transform.localPosition.x);
+        lastZFromPlatform = Mathf.Abs(transform.localPosition.z - platform.transform.localPosition.z);
         transform.localRotation = Quaternion.identity;
         previousPosition = transform.localPosition;
     }
@@ -89,10 +91,23 @@ public class rocket : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         var discreteActions = actions.DiscreteActions;
-        Debug.Log($"Discrete Actions: {discreteActions[0]} {discreteActions[1]} {discreteActions[2]} {discreteActions[3]} {discreteActions[4]}");
+        // Debug.Log($"Discrete Actions: {discreteActions[0]} {discreteActions[1]} {discreteActions[2]} {discreteActions[3]} {discreteActions[4]}");
 
-        if (rb.linearVelocity.y > 0 && discreteActions[0] == 1) {
-            AddReward(-0.01f);
+        if (rb.linearVelocity.y >= 0 && discreteActions[0] == 1) {
+            AddReward(-0.1f);
+            discreteActions[0] = 0; // shut off the main thruster if we are going up
+        }
+
+        float yDistanceToPlatform = Mathf.Abs(transform.localPosition.y - platform.transform.localPosition.y);
+
+        if (yDistanceToPlatform < 400f && rb.linearVelocity.y < -40f && discreteActions[0] == 0) {
+            AddReward(-0.1f);
+            discreteActions[0] = 1; // turn on the main thruster if we are going down too fast
+        }
+
+        if (yDistanceToPlatform < 200f && rb.linearVelocity.y < -15f && discreteActions[0] == 0) {
+            AddReward(-0.1f);
+            discreteActions[0] = 1; // turn on the main thruster if we are going down too fast
         }
 
         if (discreteActions[0] == 1) {
@@ -129,85 +144,85 @@ public class rocket : Agent
         // Debug.Log($"X Distance: {x_distance} Z Distance: {z_distance} X Velocity: {x_velocity} Z Velocity: {z_velocity}");
 
         // Step 4: determine which side thruster to turn on to push it towards the x and z of the platform
-        if (x_distance > 0) {
+        if (x_distance > 5) {
             int correctThruster = -1;
             if (transform.localPosition.x > platform.transform.localPosition.x) {
                 // rocket is to the right of the platform
                 // turn on the east thruster
                 correctThruster = 2;
-                // discreteActions[2] = 1;
+                discreteActions[2] = 1;
 
                 // if we are getting close but too fast, turn on the west thruster and shut off the east thruster (use x_difference so we are direction aware)
                 if ((x_difference < 150 && x_velocity < -10) || (x_difference < 20 && x_velocity < -0.5)) {
-                    Debug.Log("Getting close but too fast, turning on west thruster");
-                    // discreteActions[2] = 0;
-                    // discreteActions[4] = 1;
+                    // Debug.Log("Getting close but too fast, turning on west thruster");
+                    discreteActions[2] = 0;
+                    discreteActions[4] = 1;
                     correctThruster = 4;
                 }
             } else {
                 // rocket is to the left of the platform
                 // turn on the west thruster
                 correctThruster = 4;
-                // discreteActions[4] = 1;
+                discreteActions[4] = 1;
 
                 // if we are getting close but too fast, turn on the east thruster
                 if ((x_difference > -150 && x_velocity > 10) || (x_difference > -20 && x_velocity > 0.5)) {
-                    Debug.Log("Getting close but too fast, turning on east thruster");
-                    // discreteActions[4] = 0;
-                    // discreteActions[2] = 1;
+                    // Debug.Log("Getting close but too fast, turning on east thruster");
+                    discreteActions[4] = 0;
+                    discreteActions[2] = 1;
                     correctThruster = 2;
                 }
             }
 
-            if (correctThruster == 2 && discreteActions[2] == 1 && discreteActions[4] == 0) {
-                AddReward(0.02f); // The correct thrusters are on/off
-            } else if (correctThruster == 4 && discreteActions[2] == 0 && discreteActions[4] == 1) {
-                AddReward(0.02f); // The correct thrusters are on/off
-            } else {
-                AddReward(-0.01f); // The correct thrusters are not on/off
-                // Debug.Log("Incorrect Thruster On");
-            }
+            // if (correctThruster == 2 && discreteActions[2] == 1 && discreteActions[4] == 0) {
+            //     AddReward(0.02f); // The correct thrusters are on/off
+            // } else if (correctThruster == 4 && discreteActions[2] == 0 && discreteActions[4] == 1) {
+            //     AddReward(0.02f); // The correct thrusters are on/off
+            // } else {
+            //     AddReward(-0.01f); // The correct thrusters are not on/off
+            //     // Debug.Log("Incorrect Thruster On");
+            // }
         }
 
-        if (z_distance > 0) {
+        if (z_distance > 5) {
             int correctThruster = -1;
             if (transform.localPosition.z > platform.transform.localPosition.z) {
                 // rocket is to the north of the platform
                 // turn on the south thruster
-                // discreteActions[3] = 1;
+                discreteActions[3] = 1;
                 correctThruster = 3;
 
                 // if we are getting close but too fast, turn on the north thruster
                 if ((z_difference < 150 && z_velocity < -10) || (z_difference < 20 && z_velocity < -0.5)) {
-                    Debug.Log("Getting close but too fast, turning on north thruster");
-                    // discreteActions[3] = 0;
-                    // discreteActions[1] = 1;
+                    // Debug.Log("Getting close but too fast, turning on north thruster");
+                    discreteActions[3] = 0;
+                    discreteActions[1] = 1;
                     correctThruster = 1;
                 }
                 
             } else {
                 // rocket is to the south of the platform
                 // turn on the north thruster
-                // discreteActions[1] = 1;
+                discreteActions[1] = 1;
                 correctThruster = 1;
 
                 // if we are getting close but too fast, turn on the south thruster
                 if ((z_difference > -150 && z_velocity > 10) || (z_difference > -20 && z_velocity > 0.5)) {
-                    Debug.Log("Getting close but too fast, turning on south thruster");
-                    // discreteActions[1] = 0;
-                    // discreteActions[3] = 1;
+                    // Debug.Log("Getting close but too fast, turning on south thruster");
+                    discreteActions[1] = 0;
+                    discreteActions[3] = 1;
                     correctThruster = 3;
                 }
             }
 
-            if (correctThruster == 1 && discreteActions[1] == 1 && discreteActions[3] == 0) {
-                AddReward(0.02f); // The correct thrusters are on/off
-            } else if (correctThruster == 3 && discreteActions[1] == 0 && discreteActions[3] == 1) {
-                AddReward(0.02f); // The correct thrusters are on/off
-            } else {
-                AddReward(-0.01f); // The correct thrusters are not on/off
-                // Debug.Log("Incorrect Thruster On");
-            }
+            // if (correctThruster == 1 && discreteActions[1] == 1 && discreteActions[3] == 0) {
+            //     AddReward(0.02f); // The correct thrusters are on/off
+            // } else if (correctThruster == 3 && discreteActions[1] == 0 && discreteActions[3] == 1) {
+            //     AddReward(0.02f); // The correct thrusters are on/off
+            // } else {
+            //     AddReward(-0.01f); // The correct thrusters are not on/off
+            //     // Debug.Log("Incorrect Thruster On");
+            // }
         }
 
 
@@ -329,7 +344,7 @@ public class rocket : Agent
 
                 // if we are getting close but too fast, turn on the west thruster and shut off the east thruster (use x_difference so we are direction aware)
                 if ((x_difference < 150 && x_velocity < -10) || (x_difference < 20 && x_velocity < -0.5)) {
-                    Debug.Log("Getting close but too fast, turning on west thruster");
+                    // Debug.Log("Getting close but too fast, turning on west thruster");
                     actions[2] = 0;
                     actions[4] = 1;                }
             } else {
@@ -339,7 +354,7 @@ public class rocket : Agent
 
                 // if we are getting close but too fast, turn on the east thruster
                 if ((x_difference > -150 && x_velocity > 10) || (x_difference > -20 && x_velocity > 0.5)) {
-                    Debug.Log("Getting close but too fast, turning on east thruster");
+                    // Debug.Log("Getting close but too fast, turning on east thruster");
                     actions[4] = 0;
                     actions[2] = 1;
                 }
@@ -354,7 +369,7 @@ public class rocket : Agent
 
                 // if we are getting close but too fast, turn on the north thruster
                 if ((z_difference < 150 && z_velocity < -10) || (z_difference < 20 && z_velocity < -0.5)) {
-                    Debug.Log("Getting close but too fast, turning on north thruster");
+                    // Debug.Log("Getting close but too fast, turning on north thruster");
                     actions[3] = 0;
                     actions[1] = 1;
                 }
@@ -366,7 +381,7 @@ public class rocket : Agent
 
                 // if we are getting close but too fast, turn on the south thruster
                 if ((z_difference > -150 && z_velocity > 10) || (z_difference > -20 && z_velocity > 0.5)) {
-                    Debug.Log("Getting close but too fast, turning on south thruster");
+                    // Debug.Log("Getting close but too fast, turning on south thruster");
                     actions[1] = 0;
                     actions[3] = 1;
                 }
@@ -383,11 +398,14 @@ public class rocket : Agent
                 SetReward(10.0f);
                 Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = successMaterial;
+                Stats.Instance.successCount++;
                 EndEpisode();
             } else {
                 AddReward(-10.0f);
                 Debug.Log("Crashed with a velocity of: " + currentVelocity.y + " m/s");
                 platform.GetComponent<MeshRenderer>().material = failMaterial;
+                Stats.Instance.crashCount++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
         }
@@ -410,29 +428,36 @@ public class rocket : Agent
 
         // check if the rocket is below the platform
         if (transform.localPosition.y < (platform.transform.localPosition.y - 10)) {
-            Debug.Log("Failed because of going below the platform");
+            // Debug.Log("Failed because of going below the platform");
             AddReward(-15.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 1000f;
+            lastY = 2000f;
+            Stats.Instance.missedCount++;
+            Stats.Instance.failureCount++;
             EndEpisode();
         }
 
         // ignore in heuristic mode
         // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
         if (transform.localPosition.y > (lastY)) {
-            AddReward(-0.01f);
-            // platform.GetComponent<MeshRenderer>().material = failMaterial;
-            // lastY = 1000f;
-            // EndEpisode();
+            // AddReward(-0.01f);
+            platform.GetComponent<MeshRenderer>().material = failMaterial;
+            lastY = 2000f;
+            Stats.Instance.fallCount++;
+            Stats.Instance.failureCount++;
+            AddReward(-20.0f);
+            EndEpisode();
         } else if (transform.localPosition.y < (lastY)) {
             // AddReward(0.01f);
         }
 
         if (transform.localPosition.y > 2000f) {
-            Debug.Log("Failed because of going too high");
+            // Debug.Log("Failed because of going too high");
             SetReward(-20.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 1000f;
+            lastY = 2000f;
+            Stats.Instance.fallCount++;
+            Stats.Instance.failureCount++;
             EndEpisode();
         }
 
@@ -441,16 +466,25 @@ public class rocket : Agent
         float x_distance = Mathf.Abs(transform.localPosition.x - platform.transform.localPosition.x);
         float z_distance = Mathf.Abs(transform.localPosition.z - platform.transform.localPosition.z);
 
-        if ((x_distance > 20 || z_distance > 20) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
+        if ((x_distance > 10 || z_distance > 10) && (lastXFromPlatform < x_distance || lastZFromPlatform < z_distance)) {
             // add some punishment because the rocket is wandering away from the platform
+            // Debug.Log("Failed because of going too far away from the platform");
+            // AddReward(-15.0f);
+            // platform.GetComponent<MeshRenderer>().material = failMaterial;
+            // lastY = 1000f;
+            // Stats.Instance.wanderCount++;
+            // Stats.Instance.failureCount++;
+            // EndEpisode();
             AddReward(-0.01f);
         }
 
         if (x_distance > 400 || z_distance > 400) {
-            Debug.Log("Failed because of going too far away from the platform");
+            // Debug.Log("Failed because of going too far away from the platform");
             AddReward(-15.0f);
             platform.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 1000f;
+            lastY = 2000f;
+            Stats.Instance.wanderCount++;
+            Stats.Instance.failureCount++;
             EndEpisode();
         }
 
@@ -472,7 +506,7 @@ public class rocket : Agent
 
     public void changeRocket() {
         string chosenRocket = rocketDropdown.options[rocketDropdown.value].text;
-        Debug.Log("Changing Rocket to: " + chosenRocket);
+        // Debug.Log("Changing Rocket to: " + chosenRocket);
 
         if (chosenRocket == "Falcon 9") {
             falcon9_1.SetActive(true);

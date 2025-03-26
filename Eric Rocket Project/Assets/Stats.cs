@@ -39,7 +39,7 @@ public class Stats : MonoBehaviour
                         $"Wander: {wanderCount}\n" +
                         $"Wander2: {wander2Count}\n" +
                         $"Overtime: {overtimeCount}\n" +
-                        $"Fall: {fallCount}\n" +
+                        $"Wrong Direction: {fallCount}\n" +
                         $"Crashes: {crashCount}\n" +
                         $"Total: {totalCount}\n" +
                         $"Successes: {successCount}\nFailures: {failureCount}";
