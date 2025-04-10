@@ -36,6 +36,8 @@ public class rocket : Agent
     float lastY = 2000f;
     float targetSpeed = -15.0f;
 
+    // starting timestamp
+    private float startTime;
 
     private float lastXFromPlatform = 0;
     private float lastZFromPlatform = 0;
@@ -44,6 +46,8 @@ public class rocket : Agent
 
     public override void OnEpisodeBegin()
     {
+        startTime = Time.time;
+
         if (powerInput != null && massInput != null) {
             powerInput.text = power.ToString();
             massInput.text = rb.mass.ToString();
@@ -393,10 +397,14 @@ public class rocket : Agent
     {
         if (collision.gameObject.CompareTag("Goal")) {
             // check vertical speed
+            float currentTime = Time.time;
+            float timeElapsed = currentTime - startTime;
 
             if (currentVelocity.y >= targetSpeed) {
                 SetReward(10.0f);
-                Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s");
+                float timeBonus = (600 / timeElapsed) - 10;
+                AddReward(timeBonus);
+                Debug.Log("Landed with a velocity of: " + currentVelocity.y + " m/s in " + timeElapsed + " seconds");
                 platform.GetComponent<MeshRenderer>().material = successMaterial;
                 Stats.Instance.successCount++;
                 EndEpisode();
@@ -439,14 +447,16 @@ public class rocket : Agent
 
         // ignore in heuristic mode
         // bool isHeuristic = Academy.Instance.IsCommunicatorOn;
-        if (transform.localPosition.y > (lastY)) {
+        if (transform.localPosition.y >= (lastY)) {
             // AddReward(-0.01f);
-            platform.GetComponent<MeshRenderer>().material = failMaterial;
-            lastY = 2000f;
-            Stats.Instance.fallCount++;
-            Stats.Instance.failureCount++;
-            AddReward(-20.0f);
-            EndEpisode();
+
+            // NOTE: ENABLE THIS IN TRAINING MODE ONLY
+            // platform.GetComponent<MeshRenderer>().material = failMaterial;
+            // lastY = 2000f;
+            // Stats.Instance.fallCount++;
+            // Stats.Instance.failureCount++;
+            // AddReward(-20.0f);
+            // EndEpisode();
         } else if (transform.localPosition.y < (lastY)) {
             // AddReward(0.01f);
         }
