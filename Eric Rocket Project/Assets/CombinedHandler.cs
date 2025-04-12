@@ -585,12 +585,16 @@ public class CombinedHandler : Agent
 
 
             if (transform.localPosition.y > 5f){
-                transform.rotation = Quaternion.LookRotation(target.transform.position - transform.position, Vector3.up);
+                // transform.rotation = Quaternion.LookRotation(target.transform.position - transform.position, Vector3.up);
                 // add an offset of +90, 0 ,0 to make the rocket upright
-                transform.Rotate(90, 0, 0);
+                // transform.Rotate(90, 0, 0);
                 //replace the above lines with RotateTowards to make it more smooth
-                // transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(target.transform.position - transform.position, Vector3.up), 0.1f);
-                
+                // point the top of the object to towards the target gradually
+                Vector3 targetPosition = target.transform.position;
+                Vector3 direction = targetPosition - transform.position;
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                targetRotation *= Quaternion.Euler(90, 0, 0);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime);                
             }
             
 
@@ -690,10 +694,15 @@ public class CombinedHandler : Agent
         } else if (currentMode == "landing") {
 
             // keep the rocket upright
-            transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+            // transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+            // keep the rocket up gradually via slerp
+            Vector3 direction = Vector3.up;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            targetRotation *= Quaternion.Euler(90, 0, 0);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime);
 
             // zero out the local rotation
-            transform.localRotation = Quaternion.identity;
+            // transform.localRotation = Quaternion.identity;
 
             if (powerInput != null && massInput != null) {
                 power = float.Parse(powerInput.text);
