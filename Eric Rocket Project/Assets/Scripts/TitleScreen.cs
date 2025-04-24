@@ -18,7 +18,7 @@ public class TitleScreen : MonoBehaviour
     public void startGame()
     {
         // Load the scene with the name "Game"
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("Combined");
     }
 
     public void quit()
