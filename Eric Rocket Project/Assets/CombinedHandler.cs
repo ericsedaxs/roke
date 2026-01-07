@@ -1,5 +1,5 @@
 using UnityEngine;
-using Unity.Sentis;
+
 using Unity.MLAgents.Policies;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
@@ -9,9 +9,9 @@ using TMPro;
 public class CombinedHandler : Agent
 {
     // Takeoff onnx model file
-    public ModelAsset takeoffModel;
+    public Unity.InferenceEngine.ModelAsset takeoffModel;
     // Landing onnx model file
-    public ModelAsset landingModel;
+    public Unity.InferenceEngine.ModelAsset landingModel;
 
     // Behavior parameters
     public BehaviorParameters behaviorParameters;
