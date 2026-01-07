@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Eric Rocket Project.sln"
+    "dotnet.defaultSolution": "Eric Rocket Project.slnx"
 }
