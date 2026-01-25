@@ -44,6 +44,7 @@ public class CombinedHandler : Agent
 
     public TMP_InputField powerInput;
     public TMP_InputField massInput;
+    public TextMeshProUGUI controlLable;
 
     float lastY = 1000f;
     float targetSpeed = 50.0f;
@@ -56,9 +57,26 @@ public class CombinedHandler : Agent
     private float lastZRotation = 0;
     private float lastDistance = 1000f;
     private float closestDistance = 1000f;
+    private bool control = false;
 
     // start time
     private float startTime;
+
+    public void Controller() {
+
+        control = !control;
+
+        if (control)
+        {
+            behaviorParameters.BehaviorType = Unity.MLAgents.Policies.BehaviorType.HeuristicOnly;
+            controlLable.text = "Human Controller";
+        }
+        else
+        {
+            behaviorParameters.BehaviorType = Unity.MLAgents.Policies.BehaviorType.Default;
+            controlLable.text = "AI Controller";
+        }
+    }
 
     void Start() {
         // set initial model to takeoff model
@@ -533,8 +551,8 @@ public class CombinedHandler : Agent
                 AddReward(-30.0f);
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
                 lastY = 0f;
-                // Stats.Instance.overtimeCount++;
-                // Stats.Instance.failureCount++;
+                Stats.Instance.overtimeCount++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
 
@@ -572,8 +590,8 @@ public class CombinedHandler : Agent
                 AddReward(-15.0f);
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
                 lastY = 0f;
-                // Stats.Instance.wander2Count++;
-                // Stats.Instance.failureCount++;
+                Stats.Instance.wander2Count++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
 
@@ -616,8 +634,8 @@ public class CombinedHandler : Agent
                 AddReward(-15.0f);
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
                 lastY = 0f;
-                // Stats.Instance.missedCount++;
-                // Stats.Instance.failureCount++;
+                Stats.Instance.missedCount++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
 
@@ -640,8 +658,8 @@ public class CombinedHandler : Agent
                 SetReward(-25.0f);
                 indicator.GetComponent<MeshRenderer>().material = failMaterial;
                 lastY = 0f;
-                // Stats.Instance.fallCount++;
-                // Stats.Instance.failureCount++;
+                Stats.Instance.fallCount++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
 
@@ -660,8 +678,8 @@ public class CombinedHandler : Agent
                 AddReward(-15.0f);
                 target.GetComponent<MeshRenderer>().material = failMaterial;
                 lastY = 1000f;
-                // Stats.Instance.wanderCount++;
-                // Stats.Instance.failureCount++;
+                Stats.Instance.wanderCount++;
+                Stats.Instance.failureCount++;
                 EndEpisode();
             }
 
