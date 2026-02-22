@@ -14,15 +14,22 @@ pyenv activate venv
 
 Step 2: Run new training
 ```bash
-mlagents-learn config/config.yaml --run-id="RUN_NAME_HERE"
+mlagents-learn ./config/config.yaml --run-id="RUN_NAME_HERE"
 ```
 
 Resume training
 ```bash
-mlagents-learn config/config.yaml --run-id="RUN_NAME_HERE" --resume
+mlagents-learn ./config/config.yaml --run-id="RUN_NAME_HERE" --resume
 ```
 
 Overwrite training
 ```bash
-mlagents-learn config/config.yaml --run-id="RUN_NAME_HERE" --force
+mlagents-learn ./config/config.yaml --run-id="RUN_NAME_HERE" --force
 ```
+
+ls -la config/takeoff.yaml
+pwd
+
+mlagents-learn "/Users/jiajunzhang/Documents/GitHub/roke/Eric Rocket Project/config/config.yaml" --run-id="rocket takeoff1"
+
+mlagents-learn "./config/config.yaml" --run-id="rocket takeoff1"
